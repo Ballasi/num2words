@@ -42,7 +42,18 @@ const MEGAS: [&'static str; 15] = [
 ];
 
 impl English {
-    fn split_thousands(self, mut num: i64) -> Vec<i64> {
+    fn currencies(&self, currency: Currency) -> String {
+        match currency {
+            Currency::AUD => String::from("australian dollar"),
+            Currency::CAD => String::from("canadian dollar"),
+            Currency::DOLLAR => String::from("dollar"),
+            Currency::EUR => String::from("euro"),
+            Currency::GBP => String::from("pound"),
+            Currency::USD => String::from("US dollar"),
+        }
+    }
+
+    fn split_thousands(&self, mut num: i64) -> Vec<i64> {
         let mut thousands = Vec::new();
 
         while num > 0 {
@@ -53,7 +64,7 @@ impl English {
         thousands
     }
 
-    fn int_to_cardinal(self, mut num: i64) -> Result<String, Num2Err> {
+    fn int_to_cardinal(&self, mut num: i64) -> Result<String, Num2Err> {
         // special case zero
         if num == 0 {
             return Ok(String::from("zero"));
@@ -106,33 +117,29 @@ impl English {
         Ok(words.join(" "))
     }
 
-    fn float_to_cardinal(self, num: f64) -> Result<String, Num2Err> {
+    fn float_to_cardinal(&self, num: f64) -> Result<String, Num2Err> {
         let integral_part = num.floor();
+        let integral_word = self.int_to_cardinal(integral_part as i64)?;
 
-        match self.int_to_cardinal(integral_part as i64) {
-            Ok(integral_word) => {
-                let mut words: Vec<String> = vec![];
-                words.push(integral_word);
-                let as_string = num.to_string();
-                let mut split = as_string.split('.');
-                split.next();
-                match split.next() {
-                    Some(s) => {
-                        words.push(String::from("point"));
-                        for c in s.chars() {
-                            match String::from(c).parse::<usize>() {
-                                Ok(0) => words.push(String::from("zero")),
-                                Ok(i) => words.push(String::from(UNITS[i - 1])),
-                                _ => {}
-                            }
-                        }
+        let mut words: Vec<String> = vec![];
+        words.push(integral_word);
+        let as_string = num.to_string();
+        let mut split = as_string.split('.');
+        split.next();
+        match split.next() {
+            Some(s) => {
+                words.push(String::from("point"));
+                for c in s.chars() {
+                    match String::from(c).parse::<usize>() {
+                        Ok(0) => words.push(String::from("zero")),
+                        Ok(i) => words.push(String::from(UNITS[i - 1])),
+                        _ => {}
                     }
-                    None => {}
                 }
-                Ok(words.join(" "))
             }
-            Err(err) => Err(err),
+            None => {}
         }
+        Ok(words.join(" "))
     }
 }
 
@@ -187,7 +194,7 @@ impl Language for English {
                     "twelve" => String::from("twelfth"),
                     _ => {
                         if suffix.ends_with('y') {
-                            format!("{}ieth", &suffix[..suffix.len()-1])
+                            format!("{}ieth", &suffix[..suffix.len() - 1])
                         } else {
                             format!("{}th", suffix)
                         }
@@ -219,7 +226,36 @@ impl Language for English {
     }
 
     fn to_currency(self, num: Number, currency: Currency) -> Result<String, Num2Err> {
-        Ok(String::new())
+        match num {
+            Number::Int(num) => {
+                let words = self.int_to_cardinal(num as i64)?;
+                let plural_form = String::from(if num == 1 { "" } else { "s" });
+                Ok(format!(
+                    "{} {}{}",
+                    words,
+                    self.currencies(currency),
+                    plural_form
+                ))
+            }
+            Number::Float(num) => {
+                let integral_part = num.floor() as i64;
+                let cents = (num * 100.).round() as i64 % 100;
+                let cents_word = self.int_to_cardinal(cents)?;
+                let integral_word = self.to_currency(Number::Int(integral_part), currency)?;
+                let plural_form = String::from(if cents == 1 { "" } else { "s" });
+
+                if cents == 0 {
+                    Ok(integral_word)
+                } else if integral_part == 0 {
+                    Ok(format!("{} {}{}", cents_word, "cent", plural_form))
+                } else {
+                    Ok(format!(
+                        "{} and {} {}{}",
+                        integral_word, cents_word, "cent", plural_form
+                    ))
+                }
+            }
+        }
     }
 }
 
@@ -332,6 +368,18 @@ mod tests {
         assert_eq!(
             num2words!(4000, lang = "en", to = "USD"),
             Ok(String::from("four thousand US dollars"))
+        );
+        assert_eq!(
+            num2words!(1., lang = "en", to = "EUR"),
+            Ok(String::from("one euro"))
+        );
+        assert_eq!(
+            num2words!(0.20, lang = "en", to = "DOLLAR"),
+            Ok(String::from("twenty cents"))
+        );
+        assert_eq!(
+            num2words!(0, lang = "en", to = "DOLLAR"),
+            Ok(String::from("zero dollars"))
         );
     }
 
