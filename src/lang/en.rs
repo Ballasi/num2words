@@ -1,4 +1,4 @@
-use crate::{Currency, Language, Number, num2words::Num2Err};
+use crate::{num2words::Num2Err, Currency, Language, Number};
 
 pub struct English {}
 
@@ -73,23 +73,23 @@ impl English {
             let units = (triplet % 10) as usize;
 
             if hundreds > 0 {
-                words.push(UNITS[hundreds - 1].into());
-                words.push("hundred".into());
+                words.push(String::from(UNITS[hundreds - 1]));
+                words.push(String::from("hundred"));
             }
 
             if tens != 0 || units != 0 {
                 match tens {
                     0 => {
                         // case 102 => [one hundred] two
-                        words.push(UNITS[units - 1].into());
+                        words.push(String::from(UNITS[units - 1]));
                     }
                     1 => {
                         // case 112 => [one hundred] twelve
-                        words.push(TEENS[units].into());
+                        words.push(String::from(TEENS[units]));
                     }
                     _ => {
                         // case 142 => [one hundred] forty-two
-                        let mut ten: String = TENS[tens - 1].into();
+                        let mut ten: String = String::from(TENS[tens - 1]);
                         if units > 0 {
                             ten = format!("{}-{}", ten, UNITS[units - 1]);
                         }
@@ -99,7 +99,7 @@ impl English {
             }
 
             if i != 0 {
-                words.push(MEGAS[i - 1].into());
+                words.push(String::from(MEGAS[i - 1]));
             }
         }
 
@@ -107,7 +107,32 @@ impl English {
     }
 
     fn float_to_cardinal(self, num: f64) -> Result<String, Num2Err> {
-        todo!()
+        let integral_part = num.floor();
+
+        match self.int_to_cardinal(integral_part as i64) {
+            Ok(integral_word) => {
+                let mut words: Vec<String> = vec![];
+                words.push(integral_word);
+                let as_string = num.to_string();
+                let mut split = as_string.split('.');
+                split.next();
+                match split.next() {
+                    Some(s) => {
+                        words.push(String::from("point"));
+                        for c in s.chars() {
+                            match String::from(c).parse::<usize>() {
+                                Ok(0) => words.push(String::from("zero")),
+                                Ok(i) => words.push(String::from(UNITS[i - 1])),
+                                _ => {}
+                            }
+                        }
+                    }
+                    None => {}
+                }
+                Ok(words.join(" "))
+            }
+            Err(err) => Err(err),
+        }
     }
 }
 
