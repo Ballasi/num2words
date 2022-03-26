@@ -10,7 +10,16 @@ impl Language for English {
         Some(String::new())
     }
     fn to_ordinal_num(self, num: Number) -> Option<String> {
-        Some(String::new())
+        Some(format!(
+            "{}{}",
+            num,
+            match num.as_i64() % 10 {
+                1 => "st",
+                2 => "nd",
+                3 => "rd",
+                _ => "th",
+            }
+        ))
     }
     fn to_year(self, num: Number) -> Option<String> {
         Some(String::new())
