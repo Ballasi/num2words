@@ -109,7 +109,7 @@ impl English {
                 }
             }
 
-            if i != 0 {
+            if i != 0 && triplet != &0 {
                 words.push(String::from(MEGAS[i - 1]));
             }
         }
@@ -280,6 +280,10 @@ mod tests {
                  billion one hundred forty-seven million eighty-one thousand \
                  nine hundred thirty-two"
             ))
+        );
+        assert_eq!(
+            num2words!(100000000000, lang = "en", to = "cardinal"),
+            Ok(String::from("one hundred billion"))
         );
     }
 
