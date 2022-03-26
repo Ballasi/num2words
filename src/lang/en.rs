@@ -2,9 +2,121 @@ use crate::{Currency, Language, Number};
 
 pub struct English {}
 
+const UNITS: [&'static str; 9] = [
+    "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
+];
+
+const TENS: [&'static str; 9] = [
+    "ten", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety",
+];
+
+const TEENS: [&'static str; 10] = [
+    "ten",
+    "eleven",
+    "twelve",
+    "thirteen",
+    "fourteen",
+    "fifteen",
+    "sixteen",
+    "seventeen",
+    "eighteen",
+    "nineteen",
+];
+
+const MEGAS: [&'static str; 15] = [
+    "thousand",
+    "million",
+    "billion",
+    "trillion",
+    "quadrillion",
+    "quintillion",
+    "sextillion",
+    "septillion",
+    "octillion",
+    "nonillion",
+    "decillion",
+    "undecillion",
+    "duodecillion",
+    "tredecillion",
+    "quattuordecillion",
+];
+
+impl English {
+    fn split_thousands(self, mut num: i64) -> Vec<i64> {
+        let mut thousands = Vec::new();
+
+        while num > 0 {
+            thousands.push(num % 1000);
+            num /= 1000;
+        }
+
+        thousands
+    }
+
+    fn int_to_cardinal(self, mut num: i64) -> Option<String> {
+        // special case zero
+        if num == 0 {
+            return Some(String::from("zero"));
+        }
+
+        // handling negative values
+        let mut words = vec![];
+        if num < 0 {
+            words.push(String::from("minus"));
+            num = -num;
+        }
+
+        // iterate over thousands
+        for (i, triplet) in self.split_thousands(num).iter().enumerate().rev() {
+            let hundreds = (triplet / 100 % 10) as usize;
+            let tens = (triplet / 10 % 10) as usize;
+            let units = (triplet % 10) as usize;
+
+            if hundreds > 0 {
+                words.push(UNITS[hundreds - 1].into());
+                words.push("hundred".into());
+            }
+
+            if tens != 0 || units != 0 {
+                match tens {
+                    0 => {
+                        // case 102 => [one hundred] two
+                        words.push(UNITS[units - 1].into());
+                    }
+                    1 => {
+                        // case 112 => [one hundred] twelve
+                        words.push(TEENS[units].into());
+                    }
+                    _ => {
+                        // case 142 => [one hundred] forty-two
+                        let mut ten: String = TENS[tens - 1].into();
+                        if units > 0 {
+                            ten = format!("{}-{}", ten, UNITS[units - 1]);
+                        }
+                        words.push(ten);
+                    }
+                }
+            }
+
+            if i != 0 {
+                words.push(MEGAS[i - 1].into());
+            }
+        }
+
+        Some(words.join(" "))
+    }
+
+    fn float_to_cardinal(self, num: f64) -> Option<String> {
+        todo!()
+    }
+}
+
 impl Language for English {
     fn to_cardinal(self, num: Number) -> Option<String> {
-        Some(String::new())
+        match num {
+            Number::Int(i) => self.int_to_cardinal(i),
+            Number::Float(i) => self.float_to_cardinal(i),
+        }
     }
     fn to_ordinal(self, num: Number) -> Option<String> {
         Some(String::new())
@@ -35,6 +147,14 @@ mod tests {
 
     #[test]
     fn test_cardinal() {
+        assert_eq!(
+            num2words!(0, lang = "en", to = "cardinal"),
+            Some(String::from("zero"))
+        );
+        assert_eq!(
+            num2words!(-10, lang = "en", to = "cardinal"),
+            Some(String::from("minus ten"))
+        );
         assert_eq!(
             num2words!(38123147081932, lang = "en", to = "cardinal"),
             Some(String::from(
