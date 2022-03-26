@@ -9,6 +9,8 @@ pub enum Num2Err {
     CannotConvert,
     InvalidLang,
     InvalidToTag,
+    NegativeOrdinal,
+    FloatingOrdinal,
 }
 
 /// Macro to convert numbers to words
@@ -88,13 +90,33 @@ where
             } else {
                 match to {
                     "cardinal" => lang.to_cardinal(num),
-                    "ordinal" => lang.to_ordinal(num),
-                    "ordinal_num" => lang.to_ordinal_num(num),
+                    "ordinal" => {
+                        if let Number::Int(n) = num {
+                            if n < 0 {
+                                Err(Num2Err::NegativeOrdinal)
+                            } else {
+                                lang.to_ordinal(num)
+                            }
+                        } else {
+                            Err(Num2Err::FloatingOrdinal)
+                        }
+                    }
+                    "ordinal_num" => {
+                        if let Number::Int(n) = num {
+                            if n < 0 {
+                                Err(Num2Err::NegativeOrdinal)
+                            } else {
+                                lang.to_ordinal_num(num)
+                            }
+                        } else {
+                            Err(Num2Err::FloatingOrdinal)
+                        }
+                    }
                     "year" => lang.to_year(num),
                     _ => Err(Num2Err::InvalidToTag),
                 }
             }
-        },
+        }
         None => Err(Num2Err::InvalidLang),
     }
 }

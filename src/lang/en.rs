@@ -208,6 +208,14 @@ mod tests {
             num2words!(73, lang = "en", to = "ordinal_num"),
             Ok(String::from("73rd"))
         );
+        assert_eq!(
+            num2words!(-42, lang = "en", to = "ordinal_num"),
+            Err(num2words::Num2Err::NegativeOrdinal)
+        );
+        assert_eq!(
+            num2words!(7.3, lang = "en", to = "ordinal_num"),
+            Err(num2words::Num2Err::FloatingOrdinal)
+        );
     }
 
     #[test]
