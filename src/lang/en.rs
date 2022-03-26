@@ -89,11 +89,11 @@ impl English {
                     }
                     _ => {
                         // case 142 => [one hundred] forty-two
-                        let mut ten: String = String::from(TENS[tens - 1]);
-                        if units > 0 {
-                            ten = format!("{}-{}", ten, UNITS[units - 1]);
-                        }
-                        words.push(ten);
+                        let ten: String = String::from(TENS[tens - 1]);
+                        words.push(match units {
+                            0 => ten,
+                            _ => format!("{}-{}", ten, UNITS[units - 1]),
+                        });
                     }
                 }
             }
@@ -143,9 +143,64 @@ impl Language for English {
             Number::Float(i) => self.float_to_cardinal(i),
         }
     }
+
     fn to_ordinal(self, num: Number) -> Result<String, Num2Err> {
-        Ok(String::new())
+        let cardinal_word = self.to_cardinal(num)?;
+
+        let mut words: Vec<String> = vec![];
+        let mut split = cardinal_word.split_whitespace().peekable();
+
+        while let Some(w) = split.next() {
+            if split.peek().is_some() {
+                // not last word, no modification needed
+                words.push(String::from(w));
+            } else {
+                // last word, needs to be processed
+                let mut prefix = String::from("");
+                let mut suffix = String::from(w);
+
+                if w.contains('-') {
+                    // e.g. forty-two => forty-second
+                    let mut w_split = w.split('-');
+
+                    if let Some(pre) = w_split.next() {
+                        prefix = format!("{}-", pre);
+                    }
+
+                    if let Some(suf) = w_split.next() {
+                        suffix = String::from(suf);
+                    }
+                }
+
+                suffix = match suffix.as_str() {
+                    "one" => String::from("first"),
+                    "two" => String::from("second"),
+                    "three" => String::from("third"),
+                    "four" => String::from("fourth"),
+                    "five" => String::from("fifth"),
+                    "six" => String::from("sixth"),
+                    "seven" => String::from("seventh"),
+                    "eight" => String::from("eighth"),
+                    "nine" => String::from("ninth"),
+                    "ten" => String::from("tenth"),
+                    "eleven" => String::from("eleventh"),
+                    "twelve" => String::from("twelfth"),
+                    _ => {
+                        if suffix.ends_with('y') {
+                            format!("{}ieth", &suffix[..suffix.len()-1])
+                        } else {
+                            format!("{}th", suffix)
+                        }
+                    }
+                };
+
+                words.push(format!("{}{}", prefix, suffix))
+            }
+        }
+
+        Ok(words.join(" "))
     }
+
     fn to_ordinal_num(self, num: Number) -> Result<String, Num2Err> {
         Ok(format!(
             "{}{}",
@@ -158,9 +213,11 @@ impl Language for English {
             }
         ))
     }
+
     fn to_year(self, num: Number) -> Result<String, Num2Err> {
         Ok(String::new())
     }
+
     fn to_currency(self, num: Number, currency: Currency) -> Result<String, Num2Err> {
         Ok(String::new())
     }
@@ -187,6 +244,34 @@ mod tests {
                  billion one hundred forty-seven million eighty-one thousand \
                  nine hundred thirty-two"
             ))
+        );
+    }
+
+    #[test]
+    fn test_ordinal() {
+        assert_eq!(
+            num2words!(10, lang = "en", to = "ordinal"),
+            Ok(String::from("tenth"))
+        );
+        assert_eq!(
+            num2words!(21, lang = "en", to = "ordinal"),
+            Ok(String::from("twenty-first"))
+        );
+        assert_eq!(
+            num2words!(102, lang = "en", to = "ordinal"),
+            Ok(String::from("one hundred second"))
+        );
+        assert_eq!(
+            num2words!(73, lang = "en", to = "ordinal"),
+            Ok(String::from("seventy-third"))
+        );
+        assert_eq!(
+            num2words!(-1, lang = "en", to = "ordinal"),
+            Err(num2words::Num2Err::NegativeOrdinal)
+        );
+        assert_eq!(
+            num2words!(1.2, lang = "en", to = "ordinal"),
+            Err(num2words::Num2Err::FloatingOrdinal)
         );
     }
 
