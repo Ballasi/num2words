@@ -101,8 +101,9 @@ fn print_err(err: num2words::Num2Err) {
             num2words::Num2Err::CannotConvert => "cannot convert number",
             num2words::Num2Err::InvalidLang => "invalid language",
             num2words::Num2Err::InvalidToTag => "invalid to tag",
-            num2words::Num2Err::NegativeOrdinal => "cannot treat float as ordinal",
-            num2words::Num2Err::FloatingOrdinal => "cannot treat negative number as ordinal",
+            num2words::Num2Err::NegativeOrdinal => "cannot treat negative number as ordinal",
+            num2words::Num2Err::FloatingOrdinal => "cannot treat float as ordinal",
+            num2words::Num2Err::FloatingYear => "cannot treat float as year",
         }
     )
 }

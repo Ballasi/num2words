@@ -78,6 +78,7 @@ impl English {
         }
 
         // iterate over thousands
+        let mut first_elem = true;
         for (i, triplet) in self.split_thousands(num).iter().enumerate().rev() {
             let hundreds = (triplet / 100 % 10) as usize;
             let tens = (triplet / 10 % 10) as usize;
@@ -89,6 +90,12 @@ impl English {
             }
 
             if tens != 0 || units != 0 {
+                if i == 0 && !first_elem {
+                    words.push(String::from("and"));
+                } else {
+                    first_elem = false;
+                }
+
                 match tens {
                     0 => {
                         // case 102 => [one hundred] two
@@ -222,7 +229,35 @@ impl Language for English {
     }
 
     fn to_year(self, num: Number) -> Result<String, Num2Err> {
-        Ok(String::new())
+        match num {
+            Number::Int(mut year) => {
+                let mut suffix = "";
+                if year < 0 {
+                    year = -year;
+                    suffix = " BC";
+                }
+
+                let (high, low) = (year / 100, year % 100);
+                let year_word = if high == 0 || (high % 10 == 0 && low < 10) || high >= 100 {
+                    // if year is 00XX, X00X, or beyond 9999, go cardinal
+                    self.int_to_cardinal(year)?
+                } else {
+                    let high_word = self.int_to_cardinal(high)?;
+                    let low_word = if low == 0 {
+                        String::from("hundred")
+                    } else if low < 10 {
+                        format!("oh-{}", self.int_to_cardinal(low)?)
+                    } else {
+                        self.int_to_cardinal(low)?
+                    };
+
+                    format!("{} {}", high_word, low_word)
+                };
+
+                Ok(format!("{}{}", year_word, suffix))
+            }
+            Number::Float(_) => Err(Num2Err::FloatingYear),
+        }
     }
 
     fn to_currency(self, num: Number, currency: Currency) -> Result<String, Num2Err> {
@@ -278,7 +313,7 @@ mod tests {
             Ok(String::from(
                 "thirty-eight trillion one hundred twenty-three \
                  billion one hundred forty-seven million eighty-one thousand \
-                 nine hundred thirty-two"
+                 nine hundred and thirty-two"
             ))
         );
         assert_eq!(
@@ -428,6 +463,10 @@ mod tests {
         assert_eq!(
             num2words!(-44, lang = "en", to = "year"),
             Ok(String::from("forty-four BC"))
+        );
+        assert_eq!(
+            num2words!(1.1, lang = "en", to = "year"),
+            Err(num2words::Num2Err::FloatingYear)
         );
     }
 }

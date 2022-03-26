@@ -11,6 +11,7 @@ pub enum Num2Err {
     InvalidToTag,
     NegativeOrdinal,
     FloatingOrdinal,
+    FloatingYear,
 }
 
 /// Macro to convert numbers to words
