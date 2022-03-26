@@ -1,6 +1,16 @@
 use crate::{lang, Currency, Language, Number};
 use std::str::FromStr;
 
+/// Error type returned by [`num2words!`]
+///
+/// In case of
+#[derive(Debug, PartialEq)]
+pub enum Num2Err {
+    CannotConvert,
+    InvalidLang,
+    InvalidToTag,
+}
+
 /// Macro to convert numbers to words
 ///
 /// # Usage
@@ -11,11 +21,11 @@ use std::str::FromStr;
 /// ```
 /// use num2words::num2words;
 /// assert_eq!(
-///     num2words!(42), Some(String::from("forty-two"))
+///     num2words!(42), Ok(String::from("forty-two"))
 /// );
 /// assert_eq!(
 ///     num2words!(42, lang = "en", to = "ordinal"),
-///     Some(String::from("forty-second"))
+///     Ok(String::from("forty-second"))
 /// );
 /// ```
 ///
@@ -48,7 +58,7 @@ use std::str::FromStr;
 #[macro_export]
 macro_rules! num2words {
     (
-        $num: literal
+        $num: expr
         $(, lang = $lang: expr)?
         $(, to = $to: expr)?
     ) => {{
@@ -66,21 +76,25 @@ macro_rules! num2words {
 ///
 /// [`num2words!`] is calling this function, and it provides an easier
 /// usage (defaults `lang` and `to` field).
-pub fn num2words<T>(num: T, lang: &str, to: &str) -> Option<String>
+pub fn num2words<T>(num: T, lang: &str, to: &str) -> Result<String, Num2Err>
 where
-    T: Into<Number>
+    T: Into<Number>,
 {
     let num = num.into();
-    let lang = lang::to_language(lang);
-
-    if let Ok(currency) = Currency::from_str(to) {
-        lang.to_currency(num, currency)
-    } else {
-        match to {
-            "ordinal" => lang.to_ordinal(num),
-            "ordinal_num" => lang.to_ordinal_num(num),
-            "year" => lang.to_year(num),
-            _ => lang.to_cardinal(num),
-        }
+    match lang::to_language(lang) {
+        Some(lang) => {
+            if let Ok(currency) = Currency::from_str(to) {
+                lang.to_currency(num, currency)
+            } else {
+                match to {
+                    "cardinal" => lang.to_cardinal(num),
+                    "ordinal" => lang.to_ordinal(num),
+                    "ordinal_num" => lang.to_ordinal_num(num),
+                    "year" => lang.to_year(num),
+                    _ => Err(Num2Err::InvalidToTag),
+                }
+            }
+        },
+        None => Err(Num2Err::InvalidLang),
     }
 }
