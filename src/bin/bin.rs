@@ -2,55 +2,43 @@ use ::num2words::{Currency, Lang, Num2Words, Output};
 use std::env;
 use std::str::FromStr;
 
-const HELP: &str = r#"Usage: num2words <number> [--lang|-l lang] [--to|-t to]
+const HELP: &str = r#"NAME:
+    num2words - convert numbers into words
 
-For more information about all of the available languages and to
-tags, please type the following:
-    $ num2words --help lang
-    $ num2words --help to"#;
+USAGE:
+    num2words <number> [options]
+    num2words --help
 
-const HELP_LANG: &str = r#"Available languages:
-    * en: English
+VERSION:
+    v{{VERSION}}
 
-This list can be expanded! Do not hesitate to contribute!
-https://github.com/Ballasi/num2words"#;
+COMMANDS:
+GLOBAL OPTIONS:
+    --lang value, -l value   set language (default: "en")
+    --to output, -t output   set output (default: "cardinal")
+    --help, -h               show help
+    --version, -v            print the version
 
-const HELP_TO: &str = r#"Available to tags:
-    * cardinal
-    * ordinal
-    * ordinal_num
-    * year
-    * any currency
+AVAILABLE LANGUAGES:
+    en: English
 
-Currencies available:
-    * AUD
-    * CAD
-    * DOLLAR (generic, non-localized dollar)
-    * EUR
-    * GBP
-    * USD"#;
+AVAILABLE OUTPUTS:
+    cardinal:      forty-two (42)
+    ordinal:       forty-second (42)
+    ordinal_num:   42nd (42)
+    year:          nineteen oh-one (1901)
+    currency:      forty-two dollars and one cent (42.01)
+
+AVAILABLE CURRENCIES:
+    AUD      australian dollar
+    CAD      canadian dollar
+    DOLLAR   dollar
+    EUR      euro
+    GBP      pound
+    USD      US dollar"#;
 
 fn help() {
-    println!("{}", HELP)
-}
-
-fn help_lang() {
-    println!("{}", HELP_LANG)
-}
-
-fn help_to() {
-    println!("{}", HELP_TO)
-}
-
-fn handle_help(mut args: std::env::Args) {
-    match args.next() {
-        Some(cmd) => match cmd.as_str() {
-            "lang" => help_lang(),
-            "to" => help_to(),
-            _ => help(),
-        },
-        None => help(),
-    }
+    println!("{}", HELP.replace("{{VERSION}}", env!("CARGO_PKG_VERSION")))
 }
 
 fn parse_number_and_print(num: String, lang: Lang, output: Output, currency: Currency) {
@@ -145,7 +133,8 @@ fn main() {
 
     match args.next() {
         Some(num) => match num.as_str() {
-            "--help" | "-h" => handle_help(args),
+            "--help" | "-h" => help(),
+            "--version" | "-v" => println!("{} v{}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION")),
             _ => handle_cmd(num, args),
         },
         None => help(),
