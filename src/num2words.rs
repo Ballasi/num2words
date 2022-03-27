@@ -40,6 +40,21 @@ pub enum Num2Err {
     FloatingYear,
 }
 
+impl std::fmt::Display for Num2Err {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                Num2Err::CannotConvert => "cannot convert number",
+                Num2Err::NegativeOrdinal => "cannot treat negative number as ordinal",
+                Num2Err::FloatingOrdinal => "cannot treat float as ordinal",
+                Num2Err::FloatingYear => "cannot treat float as year",
+            }
+        )
+    }
+}
+
 /// Builder for `num2words`
 pub struct Num2Words {
     num: Number,
