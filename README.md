@@ -38,8 +38,8 @@ assert_eq!(
 
 These arguments can be chained.
 
-For more information about the available languages, outputs and currencies,
-see [Information](#information).
+For more information about the available languages, outputs types and
+currencies, see [Information](#information).
 
 ### Binary
 
@@ -79,17 +79,16 @@ Here is a list of all of the supported languages:
 
 This list can be expanded! Contributions are welcomed.
 
-### Supported output
+### Supported output types
 
-Here is a list of all of the supported outputs (with the command-line
+Here is a list of all of the supported outputs types (with the command-line
 interface code):
 
-- `Output::Cardinal` (`cardinal`): forty-two (42)
-- `Output::Currency` (any available currencies): forty-two dollars and one
-   cent (42.01)
-- `Output::Ordinal` (`ordinal`): forty-second (42)
-- `Output::OrdinalNum` (`ordinal_num`): 42nd (42)
-- `Output::Year` (`year`): nineteen oh-one (1901)
+- `.cardinal()` (`cardinal`): forty-two (42)
+- `.ordinal()` (`ordinal`): forty-second (42)
+- `.ordinal_num()` (`ordinal_num`): 42nd (42)
+- `.year()` (`year`): nineteen oh-one (1901)
+- any currency: forty-two dollars and one cent (42.01)
 
 ### Supported currencies
 
