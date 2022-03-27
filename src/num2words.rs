@@ -9,9 +9,9 @@ pub enum Num2Err {
     ///
     /// Example:
     /// ```
-    /// use num2words::{Num2Err, Num2Words, Output};
+    /// use num2words::{Num2Err, Num2Words};
     /// assert_eq!(
-    ///     Num2Words::new(-42).output(Output::Ordinal).to_words(),
+    ///     Num2Words::new(-42).ordinal().to_words(),
     ///     Err(Num2Err::NegativeOrdinal)
     /// );
     /// ```
@@ -20,9 +20,9 @@ pub enum Num2Err {
     ///
     /// Example:
     /// ```
-    /// use num2words::{Num2Err, Num2Words, Output};
+    /// use num2words::{Num2Err, Num2Words};
     /// assert_eq!(
-    ///     Num2Words::new(42.01).output(Output::Ordinal).to_words(),
+    ///     Num2Words::new(42.01).ordinal().to_words(),
     ///     Err(Num2Err::FloatingOrdinal)
     /// );
     /// ```
@@ -31,9 +31,9 @@ pub enum Num2Err {
     ///
     /// Example:
     /// ```
-    /// use num2words::{Num2Err, Num2Words, Output};
+    /// use num2words::{Num2Err, Num2Words};
     /// assert_eq!(
-    ///     Num2Words::new(42.01).output(Output::Year).to_words(),
+    ///     Num2Words::new(42.01).year().to_words(),
     ///     Err(Num2Err::FloatingYear)
     /// );
     /// ```
@@ -88,28 +88,69 @@ impl Num2Words {
         self
     }
 
-    /// Sets the type of output
-    ///
-    /// For all of the available outputs, see [`Output`].
+    /// Sets the type of output to cardinal (`forty-two`)
     ///
     /// Example:
     /// ```
-    /// use num2words::{Num2Words, Output};
+    /// use num2words::Num2Words;
     /// assert_eq!(
-    ///     Num2Words::new(42).output(Output::Ordinal).to_words(),
+    ///     Num2Words::new(42).cardinal().to_words(),
+    ///     Ok(String::from("forty-two"))
+    /// );
+    /// ```
+    pub fn cardinal(mut self) -> Self {
+        self.output = Output::Cardinal;
+        self
+    }
+
+    /// Sets the type of output to ordinal (`forty-second`)
+    ///
+    /// Example:
+    /// ```
+    /// use num2words::Num2Words;
+    /// assert_eq!(
+    ///     Num2Words::new(42).ordinal().to_words(),
     ///     Ok(String::from("forty-second"))
     /// );
     /// ```
-    pub fn output(mut self, output: Output) -> Self {
-        self.output = output;
+    pub fn ordinal(mut self) -> Self {
+        self.output = Output::Ordinal;
+        self
+    }
+
+    /// Sets the type of output to numbered ordinal (`42nd`)
+    ///
+    /// Example:
+    /// ```
+    /// use num2words::Num2Words;
+    /// assert_eq!(
+    ///     Num2Words::new(42).ordinal_num().to_words(),
+    ///     Ok(String::from("42nd"))
+    /// );
+    /// ```
+    pub fn ordinal_num(mut self) -> Self {
+        self.output = Output::OrdinalNum;
+        self
+    }
+
+    /// Sets the type of output to year (`nineteen oh-one`)
+    ///
+    /// Example:
+    /// ```
+    /// use num2words::Num2Words;
+    /// assert_eq!(
+    ///     Num2Words::new(1901).year().to_words(),
+    ///     Ok(String::from("nineteen oh-one"))
+    /// );
+    /// ```
+    pub fn year(mut self) -> Self {
+        self.output = Output::Year;
         self
     }
 
     /// Sets the output to the currency it has been given
     ///
     /// For all of the available currencies, see [`Currency`].
-    ///
-    /// **Warning**: this overrides the output to `Output::Currency`.
     ///
     /// Example:
     /// ```

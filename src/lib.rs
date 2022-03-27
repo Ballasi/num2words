@@ -17,8 +17,8 @@
  * assert_eq!(Num2Words::new(42).to_words(), Ok(String::from("forty-two")));
  * ```
  *
- * The builder Num2Words can take three arguments: `lang`, `output` and
- * `currency`.
+ * The builder Num2Words can take any of these arguments: `lang`, `cardinal`,
+ * `ordinal`, `ordinal_num`, `year`, and `currency`.
  *
  * ```rust
  * use num2words::*;
@@ -27,7 +27,7 @@
  *     Ok(String::from("forty-two"))
  * );
  * assert_eq!(
- *     Num2Words::new(42).output(Output::Ordinal).to_words(),
+ *     Num2Words::new(42).ordinal().to_words(),
  *     Ok(String::from("forty-second"))
  * );
  * assert_eq!(
@@ -39,7 +39,7 @@
  * These arguments can be chained.
  *
  * For more information about the available languages, outputs and currencies,
- * see [Informations](#informations).
+ * see [Information](#information).
  *
  * ### Binary
  *
@@ -67,7 +67,7 @@
  * $ num2words --help
  * ```
  *
- * ## Informations
+ * ## Information
  *
  * ### Supported languages
  *
@@ -117,6 +117,6 @@ mod output;
 pub use currency::Currency;
 pub use lang::Lang;
 pub use crate::num2words::{Num2Words, Num2Err};
-pub use output::Output;
+use output::Output;
 use lang::Language;
 use number::Number;
