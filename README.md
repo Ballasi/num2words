@@ -6,8 +6,8 @@ Convert number like `42` to `forty-two`
 
 Example usage:
 ```rust
-use num2words::num2words;
-assert_eq!(num2words!(42), Ok(String::from("forty-two")));
+use num2words::Num2Words;
+assert_eq!(Num2Words::new(42).to_words(), Ok(String::from("forty-two")));
 ```
 
 The app can also be run via a command-line interface.

@@ -296,20 +296,20 @@ impl Language for English {
 
 #[cfg(test)]
 mod tests {
-    use crate::num2words;
+    use crate::*;
 
     #[test]
     fn test_cardinal() {
         assert_eq!(
-            num2words!(0, lang = "en", to = "cardinal"),
+            Num2Words::new(0).lang(Lang::English).output(Output::Cardinal).to_words(),
             Ok(String::from("zero"))
         );
         assert_eq!(
-            num2words!(-10, lang = "en", to = "cardinal"),
+            Num2Words::new(-10).lang(Lang::English).output(Output::Cardinal).to_words(),
             Ok(String::from("minus ten"))
         );
         assert_eq!(
-            num2words!(38123147081932, lang = "en", to = "cardinal"),
+            Num2Words::new(38123147081932).lang(Lang::English).output(Output::Cardinal).to_words(),
             Ok(String::from(
                 "thirty-eight trillion one hundred twenty-three \
                  billion one hundred forty-seven million eighty-one thousand \
@@ -317,7 +317,7 @@ mod tests {
             ))
         );
         assert_eq!(
-            num2words!(100000000000, lang = "en", to = "cardinal"),
+            Num2Words::new(100000000000).lang(Lang::English).output(Output::Cardinal).to_words(),
             Ok(String::from("one hundred billion"))
         );
     }
@@ -325,27 +325,27 @@ mod tests {
     #[test]
     fn test_ordinal() {
         assert_eq!(
-            num2words!(10, lang = "en", to = "ordinal"),
+            Num2Words::new(10).lang(Lang::English).output(Output::Ordinal).to_words(),
             Ok(String::from("tenth"))
         );
         assert_eq!(
-            num2words!(21, lang = "en", to = "ordinal"),
+            Num2Words::new(21).lang(Lang::English).output(Output::Ordinal).to_words(),
             Ok(String::from("twenty-first"))
         );
         assert_eq!(
-            num2words!(102, lang = "en", to = "ordinal"),
+            Num2Words::new(102).lang(Lang::English).output(Output::Ordinal).to_words(),
             Ok(String::from("one hundred second"))
         );
         assert_eq!(
-            num2words!(73, lang = "en", to = "ordinal"),
+            Num2Words::new(73).lang(Lang::English).output(Output::Ordinal).to_words(),
             Ok(String::from("seventy-third"))
         );
         assert_eq!(
-            num2words!(-1, lang = "en", to = "ordinal"),
+            Num2Words::new(-1).lang(Lang::English).output(Output::Ordinal).to_words(),
             Err(num2words::Num2Err::NegativeOrdinal)
         );
         assert_eq!(
-            num2words!(1.2, lang = "en", to = "ordinal"),
+            Num2Words::new(1.2).lang(Lang::English).output(Output::Ordinal).to_words(),
             Err(num2words::Num2Err::FloatingOrdinal)
         );
     }
@@ -353,27 +353,27 @@ mod tests {
     #[test]
     fn test_ordinal_num() {
         assert_eq!(
-            num2words!(10, lang = "en", to = "ordinal_num"),
+            Num2Words::new(10).lang(Lang::English).output(Output::OrdinalNum).to_words(),
             Ok(String::from("10th"))
         );
         assert_eq!(
-            num2words!(21, lang = "en", to = "ordinal_num"),
+            Num2Words::new(21).lang(Lang::English).output(Output::OrdinalNum).to_words(),
             Ok(String::from("21st"))
         );
         assert_eq!(
-            num2words!(102, lang = "en", to = "ordinal_num"),
+            Num2Words::new(102).lang(Lang::English).output(Output::OrdinalNum).to_words(),
             Ok(String::from("102nd"))
         );
         assert_eq!(
-            num2words!(73, lang = "en", to = "ordinal_num"),
+            Num2Words::new(73).lang(Lang::English).output(Output::OrdinalNum).to_words(),
             Ok(String::from("73rd"))
         );
         assert_eq!(
-            num2words!(-42, lang = "en", to = "ordinal_num"),
+            Num2Words::new(-42).lang(Lang::English).output(Output::OrdinalNum).to_words(),
             Err(num2words::Num2Err::NegativeOrdinal)
         );
         assert_eq!(
-            num2words!(7.3, lang = "en", to = "ordinal_num"),
+            Num2Words::new(7.3).lang(Lang::English).output(Output::OrdinalNum).to_words(),
             Err(num2words::Num2Err::FloatingOrdinal)
         );
     }
@@ -381,19 +381,19 @@ mod tests {
     #[test]
     fn test_cardinal_float() {
         assert_eq!(
-            num2words!(12.5, lang = "en", to = "cardinal"),
+            Num2Words::new(12.5).lang(Lang::English).output(Output::Cardinal).to_words(),
             Ok(String::from("twelve point five"))
         );
         assert_eq!(
-            num2words!(12.51, lang = "en", to = "cardinal"),
+            Num2Words::new(12.51).lang(Lang::English).output(Output::Cardinal).to_words(),
             Ok(String::from("twelve point five one"))
         );
         assert_eq!(
-            num2words!(12.53, lang = "en", to = "cardinal"),
+            Num2Words::new(12.53).lang(Lang::English).output(Output::Cardinal).to_words(),
             Ok(String::from("twelve point five three"))
         );
         assert_eq!(
-            num2words!(12.59, lang = "en", to = "cardinal"),
+            Num2Words::new(12.59).lang(Lang::English).output(Output::Cardinal).to_words(),
             Ok(String::from("twelve point five nine"))
         );
     }
@@ -401,23 +401,23 @@ mod tests {
     #[test]
     fn test_currency() {
         assert_eq!(
-            num2words!(1.01, lang = "en", to = "DOLLAR"),
+            Num2Words::new(1.01).lang(Lang::English).currency(Currency::DOLLAR).to_words(),
             Ok(String::from("one dollar and one cent"))
         );
         assert_eq!(
-            num2words!(4000, lang = "en", to = "USD"),
+            Num2Words::new(4000).lang(Lang::English).currency(Currency::USD).to_words(),
             Ok(String::from("four thousand US dollars"))
         );
         assert_eq!(
-            num2words!(1., lang = "en", to = "EUR"),
+            Num2Words::new(1.).lang(Lang::English).currency(Currency::EUR).to_words(),
             Ok(String::from("one euro"))
         );
         assert_eq!(
-            num2words!(0.20, lang = "en", to = "DOLLAR"),
+            Num2Words::new(0.20).lang(Lang::English).currency(Currency::DOLLAR).to_words(),
             Ok(String::from("twenty cents"))
         );
         assert_eq!(
-            num2words!(0, lang = "en", to = "DOLLAR"),
+            Num2Words::new(0).lang(Lang::English).currency(Currency::DOLLAR).to_words(),
             Ok(String::from("zero dollars"))
         );
     }
@@ -425,47 +425,47 @@ mod tests {
     #[test]
     fn test_year() {
         assert_eq!(
-            num2words!(1990, lang = "en", to = "year"),
+            Num2Words::new(1990).lang(Lang::English).output(Output::Year).to_words(),
             Ok(String::from("nineteen ninety"))
         );
         assert_eq!(
-            num2words!(5555, lang = "en", to = "year"),
+            Num2Words::new(5555).lang(Lang::English).output(Output::Year).to_words(),
             Ok(String::from("fifty-five fifty-five"))
         );
         assert_eq!(
-            num2words!(2022, lang = "en", to = "year"),
+            Num2Words::new(2022).lang(Lang::English).output(Output::Year).to_words(),
             Ok(String::from("twenty twenty-two"))
         );
         assert_eq!(
-            num2words!(2001, lang = "en", to = "year"),
+            Num2Words::new(2001).lang(Lang::English).output(Output::Year).to_words(),
             Ok(String::from("two thousand and one"))
         );
         assert_eq!(
-            num2words!(1901, lang = "en", to = "year"),
+            Num2Words::new(1901).lang(Lang::English).output(Output::Year).to_words(),
             Ok(String::from("nineteen oh-one"))
         );
         assert_eq!(
-            num2words!(5500, lang = "en", to = "year"),
+            Num2Words::new(5500).lang(Lang::English).output(Output::Year).to_words(),
             Ok(String::from("fifty-five hundred"))
         );
         assert_eq!(
-            num2words!(500, lang = "en", to = "year"),
+            Num2Words::new(500).lang(Lang::English).output(Output::Year).to_words(),
             Ok(String::from("five hundred"))
         );
         assert_eq!(
-            num2words!(50, lang = "en", to = "year"),
+            Num2Words::new(50).lang(Lang::English).output(Output::Year).to_words(),
             Ok(String::from("fifty"))
         );
         assert_eq!(
-            num2words!(0, lang = "en", to = "year"),
+            Num2Words::new(0).lang(Lang::English).output(Output::Year).to_words(),
             Ok(String::from("zero"))
         );
         assert_eq!(
-            num2words!(-44, lang = "en", to = "year"),
+            Num2Words::new(-44).lang(Lang::English).output(Output::Year).to_words(),
             Ok(String::from("forty-four BC"))
         );
         assert_eq!(
-            num2words!(1.1, lang = "en", to = "year"),
+            Num2Words::new(1.1).lang(Lang::English).output(Output::Year).to_words(),
             Err(num2words::Num2Err::FloatingYear)
         );
     }

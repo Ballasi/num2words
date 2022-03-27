@@ -6,8 +6,8 @@
  *
  * Example usage:
  * ```
- * use num2words::num2words;
- * assert_eq!(num2words!(42), Ok(String::from("forty-two")));
+ * use num2words::Num2Words;
+ * assert_eq!(Num2Words::new(42).to_words(), Ok(String::from("forty-two")));
  * ```
  *
  * This lib will also be a downloadable binary in the near future.
@@ -21,12 +21,15 @@
  * **Warning**: this lib is not usable at its current state, we would recommend
  * you come back later.
  */
-pub mod num2words;
-
+mod num2words;
 mod currency;
 mod lang;
 mod number;
+mod output;
 
-use currency::Currency;
+pub use currency::Currency;
+pub use lang::Lang;
+pub use crate::num2words::{Num2Words, Num2Err};
+pub use output::Output;
 use lang::Language;
 use number::Number;
