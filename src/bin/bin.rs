@@ -1,4 +1,4 @@
-use ::num2words::{Currency, Lang, Num2Words, Output};
+use ::num2words::{Currency, Lang, Num2Words};
 use std::env;
 use std::str::FromStr;
 
@@ -41,90 +41,78 @@ fn help() {
     println!("{}", HELP.replace("{{VERSION}}", env!("CARGO_PKG_VERSION")))
 }
 
-fn parse_number_and_print(num: String, lang: Lang, output: Output, currency: Currency) {
-    match num.parse::<i64>() {
-        Ok(num) => match Num2Words::new(num)
-            .lang(lang)
-            .currency(currency)
-            .output(output)
-            .to_words()
-        {
-            Ok(words) => println!("{}", words),
-            Err(err) => print_err(err),
-        },
-        _ => match num.parse::<f64>() {
-            Ok(num) => match Num2Words::new(num)
-                .lang(lang)
-                .currency(currency)
-                .output(output)
-                .to_words()
-            {
-                Ok(words) => println!("{}", words),
-                Err(err) => print_err(err),
-            },
-            _ => println!("Error: cannot parse number"),
-        },
+fn num2words(num: String) -> Option<Num2Words> {
+    if let Ok(num) = num.parse::<i64>() {
+        Some(Num2Words::new(num))
+    } else if let Ok(num) = num.parse::<f64>() {
+        Some(Num2Words::new(num))
+    } else {
+        None
     }
 }
 
-fn handle_cmd(num: String, mut args: std::env::Args) {
-    let mut lang = Lang::English; //String::from("en");
-    let mut to = Output::Cardinal; //String::from("cardinal");
-    let mut currency = Currency::DOLLAR;
-
-    loop {
-        match args.next() {
-            Some(arg) => match arg.as_str() {
-                "--lang" | "-l" => match args.next() {
-                    Some(l) => {
-                        if let Ok(v) = Lang::from_str(l.as_str()) {
-                            lang = v
-                        } else {
-                            println!("Error: invalid language");
+fn handle_cmd(n: String, mut args: std::env::Args) {
+    if let Some(mut num) = num2words(n) {
+        loop {
+            match args.next() {
+                Some(arg) => match arg.as_str() {
+                    "--lang" | "-l" => match args.next() {
+                        Some(l) => {
+                            if let Ok(v) = Lang::from_str(l.as_str()) {
+                                num = num.lang(v);
+                            } else {
+                                eprintln!("Error: invalid language");
+                                return;
+                            }
+                        }
+                        None => {
+                            help();
                             return;
                         }
-                    }
-                    None => {
-                        help();
-                        return;
-                    }
-                },
-                "--to" | "-t" => match args.next() {
-                    Some(t) => {
-                        if let Ok(v) = Output::from_str(t.as_str()) {
-                            to = v
-                        } else if let Ok(v) = Currency::from_str(t.as_str()) {
-                            to = Output::Currency;
-                            currency = v;
-                        } else {
-                            println!("Error: invalid to tag");
+                    },
+                    "--to" | "-t" => match args.next() {
+                        Some(t) => {
+                            if let Ok(v) = Currency::from_str(t.as_str()) {
+                                num = num.currency(v);
+                            } else {
+                                match t.as_str() {
+                                    "cardinal" => {
+                                        num = num.cardinal();
+                                    }
+                                    "ordinal" => {
+                                        num = num.ordinal();
+                                    }
+                                    "ordinal_num" => {
+                                        num = num.ordinal_num();
+                                    }
+                                    "year" => {
+                                        num = num.year();
+                                    }
+                                    _ => {
+                                        eprintln!("Error: invalid to tag");
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                        None => {
+                            help();
                             return;
                         }
-                    }
-                    None => {
-                        help();
-                        return;
-                    }
+                    },
+                    _ => continue,
                 },
-                _ => continue,
-            },
-            None => break,
+                None => break,
+            }
         }
+
+        match num.to_words() {
+            Ok(v) => println!("{}", v),
+            Err(err) => eprintln!("Error: {}", err.to_string()),
+        }
+    } else {
+        eprintln!("Error: cannot parse number");
     }
-
-    parse_number_and_print(num, lang, to, currency)
-}
-
-fn print_err(err: num2words::Num2Err) {
-    println!(
-        "Error: {}",
-        match err {
-            num2words::Num2Err::CannotConvert => "cannot convert number",
-            num2words::Num2Err::NegativeOrdinal => "cannot treat negative number as ordinal",
-            num2words::Num2Err::FloatingOrdinal => "cannot treat float as ordinal",
-            num2words::Num2Err::FloatingYear => "cannot treat float as year",
-        }
-    )
 }
 
 fn main() {
@@ -134,7 +122,9 @@ fn main() {
     match args.next() {
         Some(num) => match num.as_str() {
             "--help" | "-h" => help(),
-            "--version" | "-v" => println!("{} v{}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION")),
+            "--version" | "-v" => {
+                println!("{} v{}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"))
+            }
             _ => handle_cmd(num, args),
         },
         None => help(),
