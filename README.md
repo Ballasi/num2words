@@ -58,8 +58,9 @@ You can download the app via the following command:
 $ cargo install num2words
 ```
 
-You can also change the language via the argument `--lang` and provide an
-output or a currency with the argument `--to`.
+You can also change the language via the CLI argument `--lang [ISO 639-1
+code]` and provide a specific output type or a currency with the argument
+`--to [cardinal|ordinal|ordinal_num|year|ISO 4217]`.
 
 For more information about the usage of `num2words` please refer to the docs
 or via the following command:
@@ -73,7 +74,7 @@ $ num2words --help
 
 Here is a list of all of the supported languages:
 
-| Flag | Code            | CLI code        | Language | 42        |
+| Flag | Code            | ISO 639-1       | Language | 42        |
 | ---- | --------------- | --------------- | -------- | --------- |
 | 🇺🇸🇬🇧 | `Lang::English` | `en`            | English  | forty-two |
 
@@ -92,8 +93,7 @@ interface code):
 
 ### Supported currencies
 
-Here is a list of all of the supported currencies (with the command-line
-interface code):
+Here is a list of all of the supported currencies (with the ISO 4217 code):
 
 - `Currency::AUD` (`AUD`): australian dollar
 - `Currency::CAD` (`CAD`): canadian dollar

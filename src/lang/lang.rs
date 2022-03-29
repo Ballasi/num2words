@@ -30,9 +30,9 @@ impl FromStr for Lang {
     /// Parses a string to return a value of this type
     ///
     ///
-    /// | &str | Lang            | 42        |
-    /// | ---- | --------------- | --------- |
-    /// | `en` | `Lang::English` | forty-two |
+    /// | ISO 639-1 | Lang            | 42        |
+    /// | --------- | --------------- | --------- |
+    /// | `en`      | `Lang::English` | forty-two |
     fn from_str(input: &str) -> Result<Self, Self::Err> {
         match input {
             "en" => Ok(Self::English),
