@@ -42,15 +42,16 @@ const MEGAS: [&'static str; 15] = [
 ];
 
 impl English {
-    fn currencies(&self, currency: Currency) -> String {
-        match currency {
-            Currency::AUD => String::from("australian dollar"),
-            Currency::CAD => String::from("canadian dollar"),
-            Currency::DOLLAR => String::from("dollar"),
-            Currency::EUR => String::from("euro"),
-            Currency::GBP => String::from("pound"),
-            Currency::USD => String::from("US dollar"),
-        }
+    fn currencies(&self, currency: Currency, plural_form: bool) -> String {
+        currency
+            .default_string()
+            .replace("{}", if plural_form { "s" } else { "" })
+    }
+
+    fn cents(&self, currency: Currency, plural_form: bool) -> String {
+        currency
+            .default_cent_string()
+            .replace("{}", if plural_form { "s" } else { "" })
     }
 
     fn split_thousands(&self, mut num: i64) -> Vec<i64> {
@@ -264,29 +265,27 @@ impl Language for English {
         match num {
             Number::Int(num) => {
                 let words = self.int_to_cardinal(num as i64)?;
-                let plural_form = String::from(if num == 1 { "" } else { "s" });
                 Ok(format!(
-                    "{} {}{}",
+                    "{} {}",
                     words,
-                    self.currencies(currency),
-                    plural_form
+                    self.currencies(currency, num != 1)
                 ))
             }
             Number::Float(num) => {
                 let integral_part = num.floor() as i64;
-                let cents = (num * 100.).round() as i64 % 100;
-                let cents_word = self.int_to_cardinal(cents)?;
+                let cents_nb = (num * 100.).round() as i64 % 100;
+                let cents_words = self.int_to_cardinal(cents_nb)?;
+                let cents_suffix = self.cents(currency, cents_nb != 1);
                 let integral_word = self.to_currency(Number::Int(integral_part), currency)?;
-                let plural_form = String::from(if cents == 1 { "" } else { "s" });
 
-                if cents == 0 {
+                if cents_nb == 0 {
                     Ok(integral_word)
                 } else if integral_part == 0 {
-                    Ok(format!("{} {}{}", cents_word, "cent", plural_form))
+                    Ok(format!("{} {}", cents_words, cents_suffix))
                 } else {
                     Ok(format!(
-                        "{} and {} {}{}",
-                        integral_word, cents_word, "cent", plural_form
+                        "{} and {} {}",
+                        integral_word, cents_words, cents_suffix
                     ))
                 }
             }
@@ -305,11 +304,17 @@ mod tests {
             Ok(String::from("zero"))
         );
         assert_eq!(
-            Num2Words::new(-10).lang(Lang::English).cardinal().to_words(),
+            Num2Words::new(-10)
+                .lang(Lang::English)
+                .cardinal()
+                .to_words(),
             Ok(String::from("minus ten"))
         );
         assert_eq!(
-            Num2Words::new(38123147081932).lang(Lang::English).cardinal().to_words(),
+            Num2Words::new(38123147081932)
+                .lang(Lang::English)
+                .cardinal()
+                .to_words(),
             Ok(String::from(
                 "thirty-eight trillion one hundred twenty-three \
                  billion one hundred forty-seven million eighty-one thousand \
@@ -317,7 +322,10 @@ mod tests {
             ))
         );
         assert_eq!(
-            Num2Words::new(100000000000).lang(Lang::English).cardinal().to_words(),
+            Num2Words::new(100000000000)
+                .lang(Lang::English)
+                .cardinal()
+                .to_words(),
             Ok(String::from("one hundred billion"))
         );
     }
@@ -353,27 +361,45 @@ mod tests {
     #[test]
     fn test_ordinal_num() {
         assert_eq!(
-            Num2Words::new(10).lang(Lang::English).ordinal_num().to_words(),
+            Num2Words::new(10)
+                .lang(Lang::English)
+                .ordinal_num()
+                .to_words(),
             Ok(String::from("10th"))
         );
         assert_eq!(
-            Num2Words::new(21).lang(Lang::English).ordinal_num().to_words(),
+            Num2Words::new(21)
+                .lang(Lang::English)
+                .ordinal_num()
+                .to_words(),
             Ok(String::from("21st"))
         );
         assert_eq!(
-            Num2Words::new(102).lang(Lang::English).ordinal_num().to_words(),
+            Num2Words::new(102)
+                .lang(Lang::English)
+                .ordinal_num()
+                .to_words(),
             Ok(String::from("102nd"))
         );
         assert_eq!(
-            Num2Words::new(73).lang(Lang::English).ordinal_num().to_words(),
+            Num2Words::new(73)
+                .lang(Lang::English)
+                .ordinal_num()
+                .to_words(),
             Ok(String::from("73rd"))
         );
         assert_eq!(
-            Num2Words::new(-42).lang(Lang::English).ordinal_num().to_words(),
+            Num2Words::new(-42)
+                .lang(Lang::English)
+                .ordinal_num()
+                .to_words(),
             Err(num2words::Num2Err::NegativeOrdinal)
         );
         assert_eq!(
-            Num2Words::new(7.3).lang(Lang::English).ordinal_num().to_words(),
+            Num2Words::new(7.3)
+                .lang(Lang::English)
+                .ordinal_num()
+                .to_words(),
             Err(num2words::Num2Err::FloatingOrdinal)
         );
     }
@@ -381,19 +407,31 @@ mod tests {
     #[test]
     fn test_cardinal_float() {
         assert_eq!(
-            Num2Words::new(12.5).lang(Lang::English).cardinal().to_words(),
+            Num2Words::new(12.5)
+                .lang(Lang::English)
+                .cardinal()
+                .to_words(),
             Ok(String::from("twelve point five"))
         );
         assert_eq!(
-            Num2Words::new(12.51).lang(Lang::English).cardinal().to_words(),
+            Num2Words::new(12.51)
+                .lang(Lang::English)
+                .cardinal()
+                .to_words(),
             Ok(String::from("twelve point five one"))
         );
         assert_eq!(
-            Num2Words::new(12.53).lang(Lang::English).cardinal().to_words(),
+            Num2Words::new(12.53)
+                .lang(Lang::English)
+                .cardinal()
+                .to_words(),
             Ok(String::from("twelve point five three"))
         );
         assert_eq!(
-            Num2Words::new(12.59).lang(Lang::English).cardinal().to_words(),
+            Num2Words::new(12.59)
+                .lang(Lang::English)
+                .cardinal()
+                .to_words(),
             Ok(String::from("twelve point five nine"))
         );
     }
@@ -401,23 +439,38 @@ mod tests {
     #[test]
     fn test_currency() {
         assert_eq!(
-            Num2Words::new(1.01).lang(Lang::English).currency(Currency::DOLLAR).to_words(),
+            Num2Words::new(1.01)
+                .lang(Lang::English)
+                .currency(Currency::DOLLAR)
+                .to_words(),
             Ok(String::from("one dollar and one cent"))
         );
         assert_eq!(
-            Num2Words::new(4000).lang(Lang::English).currency(Currency::USD).to_words(),
+            Num2Words::new(4000)
+                .lang(Lang::English)
+                .currency(Currency::USD)
+                .to_words(),
             Ok(String::from("four thousand US dollars"))
         );
         assert_eq!(
-            Num2Words::new(1.).lang(Lang::English).currency(Currency::EUR).to_words(),
+            Num2Words::new(1.)
+                .lang(Lang::English)
+                .currency(Currency::EUR)
+                .to_words(),
             Ok(String::from("one euro"))
         );
         assert_eq!(
-            Num2Words::new(0.20).lang(Lang::English).currency(Currency::DOLLAR).to_words(),
+            Num2Words::new(0.20)
+                .lang(Lang::English)
+                .currency(Currency::DOLLAR)
+                .to_words(),
             Ok(String::from("twenty cents"))
         );
         assert_eq!(
-            Num2Words::new(0).lang(Lang::English).currency(Currency::DOLLAR).to_words(),
+            Num2Words::new(0)
+                .lang(Lang::English)
+                .currency(Currency::DOLLAR)
+                .to_words(),
             Ok(String::from("zero dollars"))
         );
     }
