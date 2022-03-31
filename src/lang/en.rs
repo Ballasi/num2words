@@ -1,6 +1,9 @@
 use crate::{num2words::Num2Err, Currency, Language, Number};
 
-pub struct English {}
+pub struct English {
+    prefer_oh: bool,
+    prefer_nil: bool,
+}
 
 const UNITS: [&'static str; 9] = [
     "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
@@ -42,6 +45,13 @@ const MEGAS: [&'static str; 15] = [
 ];
 
 impl English {
+    pub fn new(prefer_oh: bool, prefer_nil: bool) -> Self {
+        Self {
+            prefer_oh,
+            prefer_nil,
+        }
+    }
+
     fn currencies(&self, currency: Currency, plural_form: bool) -> String {
         currency
             .default_string()
@@ -68,7 +78,13 @@ impl English {
     fn int_to_cardinal(&self, mut num: i64) -> Result<String, Num2Err> {
         // special case zero
         if num == 0 {
-            return Ok(String::from("zero"));
+            return Ok(String::from(if self.prefer_oh {
+                "oh"
+            } else if self.prefer_nil {
+                "nil"
+            } else {
+                "zero"
+            }));
         }
 
         // handling negative values
@@ -126,11 +142,14 @@ impl English {
     }
 
     fn float_to_cardinal(&self, num: f64) -> Result<String, Num2Err> {
-        let integral_part = num.floor();
-        let integral_word = self.int_to_cardinal(integral_part as i64)?;
-
+        let integral_part = num.floor() as i64;
         let mut words: Vec<String> = vec![];
-        words.push(integral_word);
+
+        if integral_part != 0 {
+            let integral_word = self.int_to_cardinal(integral_part)?;
+            words.push(integral_word);
+        }
+
         let as_string = num.to_string();
         let mut split = as_string.split('.');
         split.next();
@@ -139,7 +158,9 @@ impl English {
                 words.push(String::from("point"));
                 for c in s.chars() {
                     match String::from(c).parse::<usize>() {
-                        Ok(0) => words.push(String::from("zero")),
+                        Ok(0) => {
+                            words.push(String::from(if self.prefer_oh { "oh" } else { "zero" }))
+                        }
                         Ok(i) => words.push(String::from(UNITS[i - 1])),
                         _ => {}
                     }
@@ -265,11 +286,7 @@ impl Language for English {
         match num {
             Number::Int(num) => {
                 let words = self.int_to_cardinal(num as i64)?;
-                Ok(format!(
-                    "{} {}",
-                    words,
-                    self.currencies(currency, num != 1)
-                ))
+                Ok(format!("{} {}", words, self.currencies(currency, num != 1)))
             }
             Number::Float(num) => {
                 let integral_part = num.floor() as i64;
@@ -520,6 +537,38 @@ mod tests {
         assert_eq!(
             Num2Words::new(1.1).lang(Lang::English).year().to_words(),
             Err(num2words::Num2Err::FloatingYear)
+        );
+    }
+
+    #[test]
+    fn test_prefer() {
+        assert_eq!(
+            Num2Words::new(0)
+                .lang(Lang::English)
+                .prefer("oh")
+                .to_words(),
+            Ok(String::from("oh"))
+        );
+        assert_eq!(
+            Num2Words::new(0)
+                .lang(Lang::English)
+                .prefer("nil")
+                .to_words(),
+            Ok(String::from("nil"))
+        );
+        assert_eq!(
+            Num2Words::new(0.005)
+                .lang(Lang::English)
+                .prefer("oh")
+                .to_words(),
+            Ok(String::from("point oh oh five"))
+        );
+        assert_eq!(
+            Num2Words::new(2.05)
+                .lang(Lang::English)
+                .prefer("nil")
+                .to_words(),
+            Ok(String::from("two point zero five"))
         );
     }
 }

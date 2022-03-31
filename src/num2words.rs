@@ -61,6 +61,7 @@ pub struct Num2Words {
     lang: Lang,
     output: Output,
     currency: Currency,
+    preferences: Vec<String>,
 }
 
 impl Num2Words {
@@ -83,6 +84,7 @@ impl Num2Words {
             lang: Lang::English,
             output: Output::Cardinal,
             currency: Currency::DOLLAR,
+            preferences: vec![],
         }
     }
 
@@ -181,9 +183,27 @@ impl Num2Words {
         self
     }
 
+    /// Adds a preference parameter
+    ///
+    /// Example:
+    /// ```
+    /// use num2words::{Num2Words, Currency};
+    /// assert_eq!(
+    ///     Num2Words::new(0.05).prefer("oh").to_words(),
+    ///     Ok(String::from("point oh five"))
+    /// );
+    /// ```
+    pub fn prefer<T>(mut self, prefer: T) -> Self
+    where
+        T: Into<String>,
+    {
+        self.preferences.push(prefer.into());
+        self
+    }
+
     /// Builds the output
     pub fn to_words(self) -> Result<String, Num2Err> {
-        let lang = lang::to_language(self.lang);
+        let lang = lang::to_language(self.lang, self.preferences);
         match self.output {
             Output::Cardinal => lang.to_cardinal(self.num),
             Output::Currency => lang.to_currency(self.num, self.currency),

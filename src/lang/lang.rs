@@ -41,8 +41,19 @@ impl FromStr for Lang {
     }
 }
 
-pub fn to_language(lang: Lang) -> impl Language {
+pub fn to_language(lang: Lang, preferences: Vec<String>) -> impl Language {
     match lang {
-        Lang::English => lang::English {},
+        Lang::English => {
+            let last = preferences
+                .iter()
+                .filter(|v| vec!["oh", "nil"].contains(&v.as_str()))
+                .last();
+
+            if let Some(v) = last {
+                return lang::English::new(v == "oh", v == "nil");
+            }
+
+            lang::English::new(false, false)
+        }
     }
 }

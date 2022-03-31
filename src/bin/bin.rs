@@ -14,10 +14,11 @@ VERSION:
 
 COMMANDS:
 GLOBAL OPTIONS:
-    --lang value, -l value   set language (default: "en")
-    --to output, -t output   set output (default: "cardinal")
-    --help, -h               show help
-    --version, -v            print the version
+    -l, --lang [value]          set language (default: "en")
+    -t, --to [output]           set output (default: "cardinal")
+    -p, --prefer [preference]   set output (default: none)
+    -h, --help                  show help
+    -v, --version               print the version
 
 AVAILABLE LANGUAGES:
     en: English
@@ -65,6 +66,13 @@ fn handle_cmd(n: String, mut args: std::env::Args) {
                                 return;
                             }
                         }
+                        None => {
+                            help();
+                            return;
+                        }
+                    },
+                    "--prefer" | "-p" => match args.next() {
+                        Some(p) => num = num.prefer(p),
                         None => {
                             help();
                             return;
