@@ -10,7 +10,7 @@ USAGE:
     num2words --help
 
 VERSION:
-    v{{VERSION}}
+    {{VERSION}}
 
 COMMANDS:
 GLOBAL OPTIONS:
@@ -38,8 +38,25 @@ AVAILABLE CURRENCIES:
     GBP      pound
     USD      US dollar"#;
 
+fn get_version() -> String {
+    let version = env!("CARGO_PKG_VERSION");
+    let mut words = vec![];
+
+    for num in version.split(".") {
+        match String::from(num).parse::<i64>() {
+            Ok(i) => match Num2Words::new(i).prefer("oh").to_words() {
+                Ok(word) => words.push(word),
+                _ => (),
+            },
+            _ => (),
+        }
+    }
+
+    format!("v{} (version {})", version, words.join(" point "))
+}
+
 fn help() {
-    println!("{}", HELP.replace("{{VERSION}}", env!("CARGO_PKG_VERSION")))
+    println!("{}", HELP.replace("{{VERSION}}", get_version().as_str()))
 }
 
 fn num2words(num: String) -> Option<Num2Words> {
@@ -131,7 +148,7 @@ fn main() {
         Some(num) => match num.as_str() {
             "--help" | "-h" => help(),
             "--version" | "-v" => {
-                println!("{} v{}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"))
+                println!("{} {}", env!("CARGO_PKG_NAME"), get_version())
             }
             _ => handle_cmd(num, args),
         },
