@@ -43,12 +43,10 @@ fn get_version() -> String {
     let mut words = vec![];
 
     for num in version.split(".") {
-        match String::from(num).parse::<i64>() {
-            Ok(i) => match Num2Words::new(i).prefer("oh").to_words() {
-                Ok(word) => words.push(word),
-                _ => (),
-            },
-            _ => (),
+        if let Ok(i) = String::from(num).parse::<i64>() {
+            if let Ok(word) = Num2Words::new(i).prefer("oh").to_words() {
+                words.push(word);
+            }
         }
     }
 
