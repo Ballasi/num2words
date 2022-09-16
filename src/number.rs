@@ -29,9 +29,39 @@ impl Into<Number> for i64 {
     }
 }
 
+impl Into<Number> for isize {
+    fn into(self) -> Number {
+        Number::Int(self as i64)
+    }
+}
+
+impl Into<Number> for i32 {
+    fn into(self) -> Number {
+        Number::Int(self as i64)
+    }
+}
+
+impl Into<Number> for i16 {
+    fn into(self) -> Number {
+        Number::Int(self as i64)
+    }
+}
+
+impl Into<Number> for i8 {
+    fn into(self) -> Number {
+        Number::Int(self as i64)
+    }
+}
+
 impl Into<Number> for f64 {
     fn into(self) -> Number {
         Number::Float(self)
+    }
+}
+
+impl Into<Number> for f32 {
+    fn into(self) -> Number {
+        Number::Float(self as f64)
     }
 }
 
