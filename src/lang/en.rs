@@ -26,7 +26,10 @@ const TEENS: [&'static str; 10] = [
     "nineteen",
 ];
 
-const MEGAS: [&'static str; 15] = [
+// As defined by the AHD4, CED, RHD2, W3 and UM authorities
+// For more information, see
+// https://en.wikipedia.org/wiki/Names_of_large_numbers
+const MEGAS: [&'static str; 21] = [
     "thousand",
     "million",
     "billion",
@@ -42,6 +45,12 @@ const MEGAS: [&'static str; 15] = [
     "duodecillion",
     "tredecillion",
     "quattuordecillion",
+    "quindecillion",
+    "sexdecillion",
+    "septendecillion",
+    "octodecillion",
+    "novemdecillion",
+    "vigintillion",
 ];
 
 impl English {
