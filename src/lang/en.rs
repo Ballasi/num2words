@@ -337,7 +337,7 @@ mod tests {
             Ok(String::from("minus ten"))
         );
         assert_eq!(
-            Num2Words::new(38123147081932)
+            Num2Words::new(38123147081932i64)
                 .lang(Lang::English)
                 .cardinal()
                 .to_words(),
@@ -348,7 +348,7 @@ mod tests {
             ))
         );
         assert_eq!(
-            Num2Words::new(100000000000)
+            Num2Words::new(100000000000i64)
                 .lang(Lang::English)
                 .cardinal()
                 .to_words(),
