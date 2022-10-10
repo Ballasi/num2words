@@ -16,7 +16,7 @@ COMMANDS:
 GLOBAL OPTIONS:
     -l, --lang [value]          set language (default: "en")
     -t, --to [output]           set output (default: "cardinal")
-    -p, --prefer [preference]   set output (default: none)
+    -p, --prefer [preference]   add a language preference (default: none)
     -h, --help                  show help
     -v, --version               print the version
 
