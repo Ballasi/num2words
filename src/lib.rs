@@ -2,7 +2,7 @@
 #![crate_name = "num2words"]
 
 /*!
- * Convert number like `42` to `forty-two`
+ * Convert numbers like `42` to `forty-two`
  *
  * ## Usage
  *
@@ -17,7 +17,7 @@
  * assert_eq!(Num2Words::new(42).to_words(), Ok(String::from("forty-two")));
  * ```
  *
- * The builder Num2Words can take any of these arguments: `lang`, `cardinal`,
+ * The builder `Num2Words` can take any of these methods: `lang`, `cardinal`,
  * `ordinal`, `ordinal_num`, `year`, and `currency`.
  *
  * ```rust
@@ -82,25 +82,30 @@
  *
  * ### Supported output types
  *
- * Here is a list of all of the supported outputs types (with the command-line
- * interface code):
+ * Here is a list of all of the supported outputs types (with the associated
+ * command-line interface code):
  *
- * - `.cardinal()` (`cardinal`): forty-two (42)
- * - `.ordinal()` (`ordinal`): forty-second (42)
- * - `.ordinal_num()` (`ordinal_num`): 42nd (42)
- * - `.year()` (`year`): nineteen oh-one (1901)
- * - any currency: forty-two dollars and one cent (42.01)
+ * | Library method   | CLI argument  | Example output                         |
+ * | ---------------- | ------------- | -------------------------------------- |
+ * | `.cardinal()`    | `cardinal`    | forty-two (42)                         |
+ * | `.ordinal()`     | `ordinal`     | forty-second (42)                      |
+ * | `.ordinal_num()` | `ordinal_num` | 42nd (42)                              |
+ * | `.year()`        | `year`        | nineteen oh-one (1901)                 |
+ * | `.currency(cur)` | ISO 4217 code | forty-two dollars and one cent (42.01) |
  *
  * ### Supported currencies
  *
- * Here is a list of all of the supported currencies (with the ISO 4217 code):
+ * Here is a list of all of the supported currencies (with the associated
+ * command-line argument):
  *
- * - `Currency::AUD` (`AUD`): australian dollar
- * - `Currency::CAD` (`CAD`): canadian dollar
- * - `Currency::DOLLAR` (`DOLLAR`): dollar
- * - `Currency::EUR` (`EUR`): euro
- * - `Currency::GBP` (`GBP`): pound
- * - `Currency::USD` (`USD`): US dollar
+ * | Enum variant       | ISO 4217 code | Currency name in English |
+ * | ------------------ | ------------- | ------------------------ |
+ * | `Currency::AUD`    | `AUD`         | Australian dollar        |
+ * | `Currency::CAD`    | `CAD`         | Canadian dollar          |
+ * | `Currency::DOLLAR` | `DOLLAR`      | Dollar                   |
+ * | `Currency::EUR`    | `EUR`         | Euro                     |
+ * | `Currency::GBP`    | `GBP`         | Pound                    |
+ * | `Currency::USD`    | `USD`         | US dollar                |
  *
  * ### About
  *

@@ -2,7 +2,7 @@
 
 <a href="https://crates.io/crates/num2words"><img src="https://img.shields.io/crates/v/num2words"/></a> <a href="https://crates.io/crates/num2words"><img src="https://img.shields.io/crates/d/num2words"/></a> <a href="https://docs.rs/num2words"><img src="https://img.shields.io/docsrs/num2words"/></a> <a href="#license"><img src="https://img.shields.io/crates/l/num2words"/></a>
 
-Convert number like `42` to `forty-two`
+Convert numbers like `42` to `forty-two`
 
 ## Usage
 
@@ -17,7 +17,7 @@ use num2words::Num2Words;
 assert_eq!(Num2Words::new(42).to_words(), Ok(String::from("forty-two")));
 ```
 
-The builder Num2Words can take any of these arguments: `lang`, `cardinal`,
+The builder `Num2Words` can take any of these methods: `lang`, `cardinal`,
 `ordinal`, `ordinal_num`, `year`, and `currency`.
 
 ```rust
@@ -82,25 +82,30 @@ This list can be expanded! Contributions are welcomed.
 
 ### Supported output types
 
-Here is a list of all of the supported outputs types (with the command-line
-interface code):
+Here is a list of all of the supported outputs types (with the associated
+command-line interface code):
 
-- `.cardinal()` (`cardinal`): forty-two (42)
-- `.ordinal()` (`ordinal`): forty-second (42)
-- `.ordinal_num()` (`ordinal_num`): 42nd (42)
-- `.year()` (`year`): nineteen oh-one (1901)
-- any currency: forty-two dollars and one cent (42.01)
+| Library method   | CLI argument  | Example output                         |
+| ---------------- | ------------- | -------------------------------------- |
+| `.cardinal()`    | `cardinal`    | forty-two (42)                         |
+| `.ordinal()`     | `ordinal`     | forty-second (42)                      |
+| `.ordinal_num()` | `ordinal_num` | 42nd (42)                              |
+| `.year()`        | `year`        | nineteen oh-one (1901)                 |
+| `.currency(cur)` | ISO 4217 code | forty-two dollars and one cent (42.01) |
 
 ### Supported currencies
 
-Here is a list of all of the supported currencies (with the ISO 4217 code):
+Here is a list of all of the supported currencies (with the associated
+command-line argument):
 
-- `Currency::AUD` (`AUD`): australian dollar
-- `Currency::CAD` (`CAD`): canadian dollar
-- `Currency::DOLLAR` (`DOLLAR`): dollar
-- `Currency::EUR` (`EUR`): euro
-- `Currency::GBP` (`GBP`): pound
-- `Currency::USD` (`USD`): US dollar
+| Enum variant       | CLI argument  | Currency name in English |
+| ------------------ | ------------- | ------------------------ |
+| `Currency::AUD`    | `AUD`         | Australian dollar        |
+| `Currency::CAD`    | `CAD`         | Canadian dollar          |
+| `Currency::DOLLAR` | `DOLLAR`      | Dollar                   |
+| `Currency::EUR`    | `EUR`         | Euro                     |
+| `Currency::GBP`    | `GBP`         | Pound                    |
+| `Currency::USD`    | `USD`         | US dollar                |
 
 ### About
 
