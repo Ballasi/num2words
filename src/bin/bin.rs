@@ -57,18 +57,8 @@ fn help() {
     println!("{}", HELP.replace("{{VERSION}}", get_version().as_str()))
 }
 
-fn num2words(num: String) -> Option<Num2Words> {
-    if let Ok(num) = num.parse::<i64>() {
-        Some(Num2Words::new(num))
-    } else if let Ok(num) = num.parse::<f64>() {
-        Some(Num2Words::new(num))
-    } else {
-        None
-    }
-}
-
 fn handle_cmd(n: String, mut args: std::env::Args) {
-    if let Some(mut num) = num2words(n) {
+    if let Some(mut num) = Num2Words::parse(&n) {
         loop {
             match args.next() {
                 Some(arg) => match arg.as_str() {

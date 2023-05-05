@@ -1,4 +1,5 @@
-use crate::{num2words::Num2Err, Currency, Language, Number};
+use crate::{num2words::Num2Err, Currency, Language};
+use num_bigfloat::BigFloat;
 
 pub struct English {
     prefer_oh: bool,
@@ -73,20 +74,21 @@ impl English {
             .replace("{}", if plural_form { "s" } else { "" })
     }
 
-    fn split_thousands(&self, mut num: i64) -> Vec<i64> {
+    fn split_thousands(&self, mut num: BigFloat) -> Vec<u64> {
         let mut thousands = Vec::new();
+        let bf_1000 = BigFloat::from(1000);
 
-        while num > 0 {
-            thousands.push(num % 1000);
-            num /= 1000;
+        while !num.is_zero() {
+            thousands.push((num % bf_1000).to_u64().unwrap());
+            num /= bf_1000;
         }
 
         thousands
     }
 
-    fn int_to_cardinal(&self, mut num: i64) -> Result<String, Num2Err> {
+    fn int_to_cardinal(&self, mut num: BigFloat) -> Result<String, Num2Err> {
         // special case zero
-        if num == 0 {
+        if num.is_zero() {
             return Ok(String::from(if self.prefer_oh {
                 "oh"
             } else if self.prefer_nil {
@@ -98,7 +100,7 @@ impl English {
 
         // handling negative values
         let mut words = vec![];
-        if num < 0 {
+        if num.is_negative() {
             words.push(String::from("minus"));
             num = -num;
         }
@@ -143,6 +145,9 @@ impl English {
             }
 
             if i != 0 && triplet != &0 {
+                if i > MEGAS.len() {
+                    return Err(Num2Err::CannotConvert);
+                }
                 words.push(String::from(MEGAS[i - 1]));
             }
         }
@@ -150,46 +155,41 @@ impl English {
         Ok(words.join(" "))
     }
 
-    fn float_to_cardinal(&self, num: f64) -> Result<String, Num2Err> {
-        let integral_part = num.floor() as i64;
+    fn float_to_cardinal(&self, num: BigFloat) -> Result<String, Num2Err> {
+        let integral_part = num.int();
         let mut words: Vec<String> = vec![];
 
-        if integral_part != 0 {
+        if !integral_part.is_zero() {
             let integral_word = self.int_to_cardinal(integral_part)?;
             words.push(integral_word);
         }
 
-        let as_string = num.to_string();
-        let mut split = as_string.split('.');
-        split.next();
-        match split.next() {
-            Some(s) => {
-                words.push(String::from("point"));
-                for c in s.chars() {
-                    match String::from(c).parse::<usize>() {
-                        Ok(0) => {
-                            words.push(String::from(if self.prefer_oh { "oh" } else { "zero" }))
-                        }
-                        Ok(i) => words.push(String::from(UNITS[i - 1])),
-                        _ => {}
-                    }
-                }
-            }
-            None => {}
+        let mut ordinal_part = num.frac();
+        if !ordinal_part.is_zero() {
+            words.push(String::from("point"));
+        }
+        while !ordinal_part.is_zero() {
+            let digit = (ordinal_part * BigFloat::from(10)).int();
+            ordinal_part = (ordinal_part * BigFloat::from(10)).frac();
+            words.push(match digit.to_u64().unwrap() {
+                0 => String::from(if self.prefer_oh { "oh" } else { "zero" }),
+                i => String::from(UNITS[i as usize - 1]),
+            });
         }
         Ok(words.join(" "))
     }
 }
 
 impl Language for English {
-    fn to_cardinal(self, num: Number) -> Result<String, Num2Err> {
-        match num {
-            Number::Int(i) => self.int_to_cardinal(i),
-            Number::Float(i) => self.float_to_cardinal(i),
+    fn to_cardinal(self, num: BigFloat) -> Result<String, Num2Err> {
+        if num.frac().is_zero() {
+            self.int_to_cardinal(num)
+        } else {
+            self.float_to_cardinal(num)
         }
     }
 
-    fn to_ordinal(self, num: Number) -> Result<String, Num2Err> {
+    fn to_ordinal(self, num: BigFloat) -> Result<String, Num2Err> {
         let cardinal_word = self.to_cardinal(num)?;
 
         let mut words: Vec<String> = vec![];
@@ -246,11 +246,11 @@ impl Language for English {
         Ok(words.join(" "))
     }
 
-    fn to_ordinal_num(self, num: Number) -> Result<String, Num2Err> {
+    fn to_ordinal_num(self, num: BigFloat) -> Result<String, Num2Err> {
         Ok(format!(
             "{}{}",
-            num,
-            match num.as_i64() % 10 {
+            num.to_u128().unwrap(),
+            match (num % BigFloat::from(10)).to_u64().unwrap() {
                 1 => "st",
                 2 => "nd",
                 3 => "rd",
@@ -259,61 +259,68 @@ impl Language for English {
         ))
     }
 
-    fn to_year(self, num: Number) -> Result<String, Num2Err> {
-        match num {
-            Number::Int(mut year) => {
-                let mut suffix = "";
-                if year < 0 {
-                    year = -year;
-                    suffix = " BC";
-                }
-
-                let (high, low) = (year / 100, year % 100);
-                let year_word = if high == 0 || (high % 10 == 0 && low < 10) || high >= 100 {
-                    // if year is 00XX, X00X, or beyond 9999, go cardinal
-                    self.int_to_cardinal(year)?
-                } else {
-                    let high_word = self.int_to_cardinal(high)?;
-                    let low_word = if low == 0 {
-                        String::from("hundred")
-                    } else if low < 10 {
-                        format!("oh-{}", self.int_to_cardinal(low)?)
-                    } else {
-                        self.int_to_cardinal(low)?
-                    };
-
-                    format!("{} {}", high_word, low_word)
-                };
-
-                Ok(format!("{}{}", year_word, suffix))
-            }
-            Number::Float(_) => Err(Num2Err::FloatingYear),
+    fn to_year(self, num: BigFloat) -> Result<String, Num2Err> {
+        if !num.frac().is_zero() {
+            return Err(Num2Err::FloatingYear);
         }
+
+        let mut num = num;
+
+        let mut suffix = "";
+        if num.is_negative() {
+            num = num.inv_sign();
+            suffix = " BC";
+        }
+
+        let bf_100 = BigFloat::from(100);
+
+        let (high, low) = (
+            (num / bf_100).to_i64().unwrap(),
+            (num % bf_100).to_i64().unwrap(),
+        );
+        let year_word = if high == 0 || (high % 10 == 0 && low < 10) || high >= 100 {
+            // if year is 00XX, X00X, or beyond 9999, go cardinal
+            self.int_to_cardinal(num)?
+        } else {
+            let high_word = self.int_to_cardinal(BigFloat::from(high))?;
+            let low_word = if low == 0 {
+                String::from("hundred")
+            } else if low < 10 {
+                format!("oh-{}", self.int_to_cardinal(BigFloat::from(low))?)
+            } else {
+                self.int_to_cardinal(BigFloat::from(low))?
+            };
+
+            format!("{} {}", high_word, low_word)
+        };
+
+        Ok(format!("{}{}", year_word, suffix))
     }
 
-    fn to_currency(self, num: Number, currency: Currency) -> Result<String, Num2Err> {
-        match num {
-            Number::Int(num) => {
-                let words = self.int_to_cardinal(num as i64)?;
-                Ok(format!("{} {}", words, self.currencies(currency, num != 1)))
-            }
-            Number::Float(num) => {
-                let integral_part = num.floor() as i64;
-                let cents_nb = (num * 100.).round() as i64 % 100;
-                let cents_words = self.int_to_cardinal(cents_nb)?;
-                let cents_suffix = self.cents(currency, cents_nb != 1);
-                let integral_word = self.to_currency(Number::Int(integral_part), currency)?;
+    fn to_currency(self, num: BigFloat, currency: Currency) -> Result<String, Num2Err> {
+        if num.frac().is_zero() {
+            let words = self.int_to_cardinal(num)?;
+            Ok(format!(
+                "{} {}",
+                words,
+                self.currencies(currency, num != BigFloat::from(1))
+            ))
+        } else {
+            let integral_part = num.int();
+            let cents_nb = (num * BigFloat::from(100)).int() % BigFloat::from(100);
+            let cents_words = self.int_to_cardinal(cents_nb)?;
+            let cents_suffix = self.cents(currency, cents_nb != BigFloat::from(1));
+            let integral_word = self.to_currency(integral_part, currency)?;
 
-                if cents_nb == 0 {
-                    Ok(integral_word)
-                } else if integral_part == 0 {
-                    Ok(format!("{} {}", cents_words, cents_suffix))
-                } else {
-                    Ok(format!(
-                        "{} and {} {}",
-                        integral_word, cents_words, cents_suffix
-                    ))
-                }
+            if cents_nb.is_zero() {
+                Ok(integral_word)
+            } else if integral_part.is_zero() {
+                Ok(format!("{} {}", cents_words, cents_suffix))
+            } else {
+                Ok(format!(
+                    "{} and {} {}",
+                    integral_word, cents_words, cents_suffix
+                ))
             }
         }
     }
@@ -578,6 +585,41 @@ mod tests {
                 .prefer("nil")
                 .to_words(),
             Ok(String::from("two point zero five"))
+        );
+    }
+
+    #[test]
+    fn test_big_num() {
+        use crate::lang::en::MEGAS;
+        use num_bigfloat::BigFloat;
+
+        let mut num = BigFloat::from(1);
+        for m in MEGAS {
+            num *= BigFloat::from(1000);
+            assert_eq!(
+                Num2Words::new(num)
+                    .lang(Lang::English)
+                    .cardinal()
+                    .to_words(),
+                Ok(String::from(format!("one {}", m)))
+            );
+        }
+
+        assert_eq!(
+            Num2Words::parse("2.8e64")
+                .unwrap()
+                .lang(Lang::English)
+                .cardinal()
+                .to_words(),
+            Ok(String::from("twenty-eight vigintillion"))
+        );
+
+        assert_eq!(
+            Num2Words::new(1e100)
+                .lang(Lang::English)
+                .cardinal()
+                .to_words(),
+            Err(num2words::Num2Err::CannotConvert)
         );
     }
 }

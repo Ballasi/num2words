@@ -108,14 +108,13 @@
  * lib](https://github.com/savoirfairelinux/num2words/).
  */
 mod num2words;
+
 mod currency;
 mod lang;
-mod number;
 mod output;
 
+pub use crate::num2words::{Num2Err, Num2Words};
 pub use currency::Currency;
 pub use lang::Lang;
-pub use crate::num2words::{Num2Words, Num2Err};
-use output::Output;
 use lang::Language;
-use number::Number;
+use output::Output;

@@ -1,9 +1,22 @@
-use crate::{lang, Currency, Lang, Language, Number, Output};
+use crate::{lang, Currency, Lang, Language, Output};
+use num_bigfloat::BigFloat;
 
 /// Error type returned by the builder
 #[derive(Debug, PartialEq)]
 pub enum Num2Err {
     /// General error, language cannot convert number
+    ///
+    /// It is likely that the language does not support the number because
+    /// it is too large.
+    ///
+    /// Example:
+    /// ```
+    /// use num2words::{Num2Err, Num2Words};
+    /// assert_eq!(
+    ///     Num2Words::new(1e100).to_words(),
+    ///     Err(Num2Err::CannotConvert)
+    /// );
+    /// ```
     CannotConvert,
     /// Request of a negative ordinal
     ///
@@ -57,7 +70,7 @@ impl std::fmt::Display for Num2Err {
 
 /// Builder for `num2words`
 pub struct Num2Words {
-    num: Number,
+    num: BigFloat,
     lang: Lang,
     output: Output,
     currency: Currency,
@@ -74,10 +87,14 @@ impl Num2Words {
     ///     Num2Words::new(42).to_words(),
     ///     Ok(String::from("forty-two"))
     /// );
+    /// assert_eq!(
+    ///     Num2Words::new(1e3).to_words(),
+    ///     Ok(String::from("one thousand"))
+    /// );
     /// ```
     pub fn new<T>(num: T) -> Self
     where
-        T: Into<Number>,
+        T: Into<BigFloat>,
     {
         Self {
             num: num.into(),
@@ -86,6 +103,31 @@ impl Num2Words {
             currency: Currency::DOLLAR,
             preferences: vec![],
         }
+    }
+
+    /// Creates a new builder from a string
+    ///
+    /// Example:
+    /// ```
+    /// use num2words::Num2Words;
+    /// assert_eq!(
+    ///     Num2Words::parse("42").unwrap().to_words(),
+    ///     Ok(String::from("forty-two"))
+    /// );
+    /// assert_eq!(
+    ///     Num2Words::parse("1e3").unwrap().to_words(),
+    ///     Ok(String::from("one thousand"))
+    /// );
+    /// ```
+    pub fn parse(num: &str) -> Option<Self> {
+        let num = BigFloat::parse(num)?;
+        Some(Self {
+            num,
+            lang: Lang::English,
+            output: Output::Cardinal,
+            currency: Currency::DOLLAR,
+            preferences: vec![],
+        })
     }
 
     /// Sets the language of the output
@@ -208,28 +250,37 @@ impl Num2Words {
             Output::Cardinal => lang.to_cardinal(self.num),
             Output::Currency => lang.to_currency(self.num, self.currency),
             Output::Ordinal => {
-                if let Number::Int(n) = self.num {
-                    if n < 0 {
-                        Err(Num2Err::NegativeOrdinal)
-                    } else {
-                        lang.to_ordinal(self.num)
-                    }
-                } else {
-                    Err(Num2Err::FloatingOrdinal)
+                if !self.num.frac().is_zero() {
+                    return Err(Num2Err::FloatingOrdinal);
                 }
+                if self.num.is_negative() {
+                    return Err(Num2Err::NegativeOrdinal);
+                }
+                lang.to_ordinal(self.num)
             }
             Output::OrdinalNum => {
-                if let Number::Int(n) = self.num {
-                    if n < 0 {
-                        Err(Num2Err::NegativeOrdinal)
-                    } else {
-                        lang.to_ordinal_num(self.num)
-                    }
-                } else {
-                    Err(Num2Err::FloatingOrdinal)
+                if !self.num.frac().is_zero() {
+                    return Err(Num2Err::FloatingOrdinal);
                 }
+                if self.num.is_negative() {
+                    return Err(Num2Err::NegativeOrdinal);
+                }
+                lang.to_ordinal_num(self.num)
             }
             Output::Year => lang.to_year(self.num),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::*;
+
+    #[test]
+    fn test_string_not_valid() {
+        match Num2Words::parse("not a number") {
+            Some(_) => assert!(false),
+            None => assert!(true),
         }
     }
 }
