@@ -51,6 +51,28 @@ pub enum Num2Err {
     /// );
     /// ```
     FloatingYear,
+    /// Request of an infinite ordinal
+    ///
+    /// Example:
+    /// ```
+    /// use num2words::{Num2Err, Num2Words};
+    /// assert_eq!(
+    ///     Num2Words::parse("inf").unwrap().ordinal().to_words(),
+    ///     Err(Num2Err::InfiniteOrdinal)
+    /// );
+    /// ```
+    InfiniteOrdinal,
+    /// Request of an infinite year
+    ///
+    /// Example:
+    /// ```
+    /// use num2words::{Num2Err, Num2Words};
+    /// assert_eq!(
+    ///     Num2Words::parse("inf").unwrap().year().to_words(),
+    ///     Err(Num2Err::InfiniteYear)
+    /// );
+    /// ```
+    InfiniteYear,
 }
 
 impl std::fmt::Display for Num2Err {
@@ -63,6 +85,8 @@ impl std::fmt::Display for Num2Err {
                 Num2Err::NegativeOrdinal => "cannot treat negative number as ordinal",
                 Num2Err::FloatingOrdinal => "cannot treat float as ordinal",
                 Num2Err::FloatingYear => "cannot treat float as year",
+                Num2Err::InfiniteOrdinal => "cannot treat infinity as ordinal",
+                Num2Err::InfiniteYear => "cannot treat infinity as year",
             }
         )
     }
@@ -250,6 +274,9 @@ impl Num2Words {
             Output::Cardinal => lang.to_cardinal(self.num),
             Output::Currency => lang.to_currency(self.num, self.currency),
             Output::Ordinal => {
+                if self.num.is_inf() {
+                    return Err(Num2Err::InfiniteOrdinal);
+                }
                 if !self.num.frac().is_zero() {
                     return Err(Num2Err::FloatingOrdinal);
                 }
@@ -259,6 +286,9 @@ impl Num2Words {
                 lang.to_ordinal(self.num)
             }
             Output::OrdinalNum => {
+                if self.num.is_inf() {
+                    return Err(Num2Err::InfiniteOrdinal);
+                }
                 if !self.num.frac().is_zero() {
                     return Err(Num2Err::FloatingOrdinal);
                 }
@@ -267,7 +297,15 @@ impl Num2Words {
                 }
                 lang.to_ordinal_num(self.num)
             }
-            Output::Year => lang.to_year(self.num),
+            Output::Year => {
+                if self.num.is_inf() {
+                    return Err(Num2Err::InfiniteYear);
+                }
+                if !self.num.frac().is_zero() {
+                    return Err(Num2Err::FloatingYear);
+                }
+                lang.to_year(self.num)
+            }
         }
     }
 }

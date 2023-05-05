@@ -182,7 +182,11 @@ impl English {
 
 impl Language for English {
     fn to_cardinal(self, num: BigFloat) -> Result<String, Num2Err> {
-        if num.frac().is_zero() {
+        if num.is_inf_pos() {
+            Ok(String::from("infinity"))
+        } else if num.is_inf_neg() {
+            Ok(String::from("minus infinity"))
+        } else if num.frac().is_zero() {
             self.int_to_cardinal(num)
         } else {
             self.float_to_cardinal(num)
@@ -298,7 +302,13 @@ impl Language for English {
     }
 
     fn to_currency(self, num: BigFloat, currency: Currency) -> Result<String, Num2Err> {
-        if num.frac().is_zero() {
+        if num.is_inf() {
+            Ok(format!(
+                "{}an infinity of {}",
+                if num.is_negative() { "minus " } else { "" },
+                self.currencies(currency, true)
+            ))
+        } else if num.frac().is_zero() {
             let words = self.int_to_cardinal(num)?;
             Ok(format!(
                 "{} {}",
@@ -620,6 +630,57 @@ mod tests {
                 .cardinal()
                 .to_words(),
             Err(num2words::Num2Err::CannotConvert)
+        );
+    }
+
+    #[test]
+    fn test_infinity() {
+        assert_eq!(
+            Num2Words::new(f64::INFINITY)
+                .lang(Lang::English)
+                .cardinal()
+                .to_words(),
+            Ok(String::from("infinity"))
+        );
+
+        assert_eq!(
+            Num2Words::new(f64::NEG_INFINITY)
+                .lang(Lang::English)
+                .cardinal()
+                .to_words(),
+            Ok(String::from("minus infinity"))
+        );
+
+        assert_eq!(
+            Num2Words::new(f64::INFINITY)
+                .lang(Lang::English)
+                .ordinal()
+                .to_words(),
+            Err(num2words::Num2Err::InfiniteOrdinal)
+        );
+
+        assert_eq!(
+            Num2Words::new(f64::INFINITY)
+                .lang(Lang::English)
+                .ordinal_num()
+                .to_words(),
+            Err(num2words::Num2Err::InfiniteOrdinal)
+        );
+
+        assert_eq!(
+            Num2Words::new(f64::INFINITY)
+                .lang(Lang::English)
+                .year()
+                .to_words(),
+            Err(num2words::Num2Err::InfiniteYear)
+        );
+
+        assert_eq!(
+            Num2Words::new(f64::INFINITY)
+                .lang(Lang::English)
+                .currency(Currency::DOLLAR)
+                .to_words(),
+            Ok(String::from("an infinity of dollars"))
         );
     }
 }
