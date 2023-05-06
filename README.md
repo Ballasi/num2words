@@ -46,6 +46,7 @@ currencies, see [Information](#information).
 This crate provides a command-line interface to run requests on `num2words`.
 
 Example:
+
 ```sh
 $ num2words 42
 forty-two
@@ -54,6 +55,7 @@ ten euros
 ```
 
 You can download the app via the following command:
+
 ```sh
 $ cargo install num2words
 ```
@@ -64,6 +66,7 @@ code]` and provide a specific output type or a currency with the argument
 
 For more information about the usage of `num2words` please refer to the docs
 or via the following command:
+
 ```sh
 $ num2words --help
 ```
@@ -74,9 +77,9 @@ $ num2words --help
 
 Here is a list of all of the supported languages:
 
-| Flag | Code            | ISO 639-1       | Language | 42        |
-| ---- | --------------- | --------------- | -------- | --------- |
-| 🇺🇸🇬🇧 | `Lang::English` | `en`            | English  | forty-two |
+| Flag | Code            | ISO 639-1 | Language | 42        |
+| ---- | --------------- | --------- | -------- | --------- |
+| 🇺🇸🇬🇧 | `Lang::English` | `en`      | English  | forty-two |
 
 This list can be expanded! Contributions are welcomed.
 
@@ -95,17 +98,12 @@ command-line interface code):
 
 ### Supported currencies
 
-Here is a list of all of the supported currencies (with the associated
-command-line argument):
+Three-letter enum variants corresponds to the currency's ISO 4217 code, but
+there are exceptions to accomodate generic terminologies: `DINAR`, `DOLLAR`,
+`PESO` and `RIYAL`.
 
-| Enum variant       | CLI argument  | Currency name in English |
-| ------------------ | ------------- | ------------------------ |
-| `Currency::AUD`    | `AUD`         | Australian dollar        |
-| `Currency::CAD`    | `CAD`         | Canadian dollar          |
-| `Currency::DOLLAR` | `DOLLAR`      | Dollar                   |
-| `Currency::EUR`    | `EUR`         | Euro                     |
-| `Currency::GBP`    | `GBP`         | Pound                    |
-| `Currency::USD`    | `USD`         | US dollar                |
+A summary of all of the supported currencies are available in the [documentation
+of `Currency`](https://docs.rs/num2words/latest/num2words/enum.Currency.html).
 
 ### About
 

@@ -63,15 +63,11 @@ impl English {
     }
 
     fn currencies(&self, currency: Currency, plural_form: bool) -> String {
-        currency
-            .default_string()
-            .replace("{}", if plural_form { "s" } else { "" })
+        currency.default_string(plural_form)
     }
 
     fn cents(&self, currency: Currency, plural_form: bool) -> String {
-        currency
-            .default_cent_string()
-            .replace("{}", if plural_form { "s" } else { "" })
+        currency.default_cent_string(plural_form)
     }
 
     fn split_thousands(&self, mut num: BigFloat) -> Vec<u64> {
