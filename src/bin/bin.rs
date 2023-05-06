@@ -31,12 +31,8 @@ AVAILABLE OUTPUTS:
     currency:      forty-two dollars and one cent (42.01)
 
 AVAILABLE CURRENCIES:
-    AUD      australian dollar
-    CAD      canadian dollar
-    DOLLAR   dollar
-    EUR      euro
-    GBP      pound
-    USD      US dollar"#;
+    ISO 4217 code - USD, EUR, GBP, etc.
+    generic currencies - DINAR, DOLLAR, PESO, RIYAL"#;
 
 fn get_version() -> String {
     let version = env!("CARGO_PKG_VERSION");
