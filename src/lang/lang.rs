@@ -6,11 +6,11 @@ use std::str::FromStr;
 
 /// Defines what is a language
 pub trait Language {
-    fn to_cardinal(self, num: BigFloat) -> Result<String, Num2Err>;
-    fn to_ordinal(self, num: BigFloat) -> Result<String, Num2Err>;
-    fn to_ordinal_num(self, num: BigFloat) -> Result<String, Num2Err>;
-    fn to_year(self, num: BigFloat) -> Result<String, Num2Err>;
-    fn to_currency(self, num: BigFloat, currency: Currency) -> Result<String, Num2Err>;
+    fn to_cardinal(&self, num: BigFloat) -> Result<String, Num2Err>;
+    fn to_ordinal(&self, num: BigFloat) -> Result<String, Num2Err>;
+    fn to_ordinal_num(&self, num: BigFloat) -> Result<String, Num2Err>;
+    fn to_year(&self, num: BigFloat) -> Result<String, Num2Err>;
+    fn to_currency(&self, num: BigFloat, currency: Currency) -> Result<String, Num2Err>;
 }
 
 /// Languages available in `num2words`
@@ -42,7 +42,7 @@ impl FromStr for Lang {
     }
 }
 
-pub fn to_language(lang: Lang, preferences: Vec<String>) -> impl Language {
+pub fn to_language(lang: Lang, preferences: Vec<String>) -> Box<dyn Language> {
     match lang {
         Lang::English => {
             let last = preferences
@@ -51,10 +51,10 @@ pub fn to_language(lang: Lang, preferences: Vec<String>) -> impl Language {
                 .last();
 
             if let Some(v) = last {
-                return lang::English::new(v == "oh", v == "nil");
+                return Box::new(lang::English::new(v == "oh", v == "nil"));
             }
 
-            lang::English::new(false, false)
+            Box::new(lang::English::new(false, false))
         }
     }
 }

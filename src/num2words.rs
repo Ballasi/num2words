@@ -1,4 +1,4 @@
-use crate::{lang, Currency, Lang, Language, Output};
+use crate::{lang, Currency, Lang, Output};
 use num_bigfloat::BigFloat;
 
 /// Error type returned by the builder

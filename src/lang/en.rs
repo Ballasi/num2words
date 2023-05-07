@@ -177,7 +177,7 @@ impl English {
 }
 
 impl Language for English {
-    fn to_cardinal(self, num: BigFloat) -> Result<String, Num2Err> {
+    fn to_cardinal(&self, num: BigFloat) -> Result<String, Num2Err> {
         if num.is_inf_pos() {
             Ok(String::from("infinity"))
         } else if num.is_inf_neg() {
@@ -189,7 +189,7 @@ impl Language for English {
         }
     }
 
-    fn to_ordinal(self, num: BigFloat) -> Result<String, Num2Err> {
+    fn to_ordinal(&self, num: BigFloat) -> Result<String, Num2Err> {
         let cardinal_word = self.to_cardinal(num)?;
 
         let mut words: Vec<String> = vec![];
@@ -246,7 +246,7 @@ impl Language for English {
         Ok(words.join(" "))
     }
 
-    fn to_ordinal_num(self, num: BigFloat) -> Result<String, Num2Err> {
+    fn to_ordinal_num(&self, num: BigFloat) -> Result<String, Num2Err> {
         Ok(format!(
             "{}{}",
             num.to_u128().unwrap(),
@@ -259,7 +259,7 @@ impl Language for English {
         ))
     }
 
-    fn to_year(self, num: BigFloat) -> Result<String, Num2Err> {
+    fn to_year(&self, num: BigFloat) -> Result<String, Num2Err> {
         if !num.frac().is_zero() {
             return Err(Num2Err::FloatingYear);
         }
@@ -297,7 +297,7 @@ impl Language for English {
         Ok(format!("{}{}", year_word, suffix))
     }
 
-    fn to_currency(self, num: BigFloat, currency: Currency) -> Result<String, Num2Err> {
+    fn to_currency(&self, num: BigFloat, currency: Currency) -> Result<String, Num2Err> {
         if num.is_inf() {
             Ok(format!(
                 "{}an infinity of {}",
@@ -638,7 +638,6 @@ mod tests {
                 .to_words(),
             Ok(String::from("infinity"))
         );
-
         assert_eq!(
             Num2Words::new(f64::NEG_INFINITY)
                 .lang(Lang::English)
@@ -646,7 +645,6 @@ mod tests {
                 .to_words(),
             Ok(String::from("minus infinity"))
         );
-
         assert_eq!(
             Num2Words::new(f64::INFINITY)
                 .lang(Lang::English)
@@ -654,7 +652,6 @@ mod tests {
                 .to_words(),
             Err(num2words::Num2Err::InfiniteOrdinal)
         );
-
         assert_eq!(
             Num2Words::new(f64::INFINITY)
                 .lang(Lang::English)
@@ -662,7 +659,6 @@ mod tests {
                 .to_words(),
             Err(num2words::Num2Err::InfiniteOrdinal)
         );
-
         assert_eq!(
             Num2Words::new(f64::INFINITY)
                 .lang(Lang::English)
@@ -670,7 +666,6 @@ mod tests {
                 .to_words(),
             Err(num2words::Num2Err::InfiniteYear)
         );
-
         assert_eq!(
             Num2Words::new(f64::INFINITY)
                 .lang(Lang::English)
