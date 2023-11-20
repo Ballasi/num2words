@@ -145,6 +145,9 @@ impl Num2Words {
     /// ```
     pub fn parse(num: &str) -> Option<Self> {
         let num = BigFloat::parse(num)?;
+        if num.is_nan() {
+            return None;
+        }
         Some(Self {
             num,
             lang: Lang::English,
@@ -317,6 +320,10 @@ mod tests {
     #[test]
     fn test_string_not_valid() {
         match Num2Words::parse("not a number") {
+            Some(_) => assert!(false),
+            None => assert!(true),
+        }
+        match Num2Words::parse("NAN") {
             Some(_) => assert!(false),
             None => assert!(true),
         }
