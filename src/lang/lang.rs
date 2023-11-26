@@ -23,6 +23,7 @@ pub enum Lang {
     /// );
     /// ```
     English,
+    Ukrainian,
 }
 
 impl FromStr for Lang {
@@ -37,6 +38,7 @@ impl FromStr for Lang {
     fn from_str(input: &str) -> Result<Self, Self::Err> {
         match input {
             "en" => Ok(Self::English),
+            "uk" => Ok(Self::Ukrainian),
             _ => Err(()),
         }
     }
@@ -55,6 +57,24 @@ pub fn to_language(lang: Lang, preferences: Vec<String>) -> Box<dyn Language> {
             }
 
             Box::new(lang::English::new(false, false))
+        }
+        Lang::Ukrainian => {
+            let declenation: lang::uk::Declenation = preferences
+                .iter()
+                .filter_map(|d| d.parse().ok())
+                .last()
+                .unwrap_or_default();
+            let gender: lang::uk::Gender = preferences
+                .iter()
+                .filter_map(|d| d.parse().ok())
+                .last()
+                .unwrap_or_default();
+            let number: lang::uk::GrammaticalNumber = preferences
+                .iter()
+                .filter_map(|d| d.parse().ok())
+                .last()
+                .unwrap_or_default();
+            Box::new(lang::Ukrainian::new(gender, number, declenation))
         }
     }
 }
