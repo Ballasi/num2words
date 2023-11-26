@@ -139,6 +139,11 @@ impl GrammaticalProperties {
         if units == 0 || units > 4 || tens == 1 {
             GrammaticalProperties {
                 number: GrammaticalNumber::Plural,
+                declenation: if self.declenation == Declenation::Nominative {
+                    Declenation::Genitive
+                } else {
+                    self.declenation
+                },
                 ..*self
             }
         } else if units == 1 {
@@ -146,16 +151,9 @@ impl GrammaticalProperties {
                 number: GrammaticalNumber::Singular,
                 ..*self
             }
-        } else {
-            //2..4
-
+        } else {  //units in 2..4
             GrammaticalProperties {
                 number: GrammaticalNumber::Plural,
-                declenation: if self.declenation == Declenation::Nominative {
-                    Declenation::Genitive
-                } else {
-                    self.declenation
-                },
                 ..*self
             }
         }
@@ -187,6 +185,8 @@ const ZERO: [&str; 6] = [
     "нулі", //"нулю"
 ];
 
+const ORDINAL_ZERO_BASE: &str = "нульов";
+
 #[rustfmt::skip]
 const GENDERED: [[[&str; 6]; 3];2] = [[
     [ "один", "одного", "одному", "один", "одним", "одному" ],
@@ -199,6 +199,8 @@ const GENDERED: [[[&str; 6]; 3];2] = [[
     [ "два", "двох", "двом", "два", "двома", "двох" ],
 ]];
 
+const ONE_BASE: &str = "одно";
+
 #[rustfmt::skip]
 const UNITS: [[&str; 6]; 7] = [
     [ "три",     "трьох",    "трьом",    "три",     "трьома",    "трьох"    ],
@@ -210,9 +212,30 @@ const UNITS: [[&str; 6]; 7] = [
     [ "девʼять", "девʼяти",  "девʼяти",  "девʼять", "девʼятьма", "девʼяти"  ],
 ];
 
-#[rustfmt::skip]
+const ORDINAL_UNIT_BASES: [&str; 9] = [
+    "перш", "друг", "трет", "четверт", "пʼят", "шост", "сьом", "восьм", "девʼят"
+];
+
+const TEENS_BASES: [&str; 10] = [
+     "десят",
+     "одинадцят",
+     "дванадцят",  
+     "тринадцят",  
+     "чотирнадцят",
+     "пʼятнадцят", 
+     "шістнадцят", 
+     "сімнадцят",  
+     "вісімнадцят",
+     "девʼятнадцят"
+];
+
+const TEENS_FLEXIONS: [&str; 6] = [
+     "ь", "и", "и", "ь", "ьма", "и"        
+];
+
+/*#[rustfmt::skip]
 const TEENS: [[&str; 6]; 10] = [
-    [ "десять",        "десяти",        "десяти",        "десять",        "десятьом",        "десяти"        ],
+    [ "десять",        "десяти",        "десяти",        "десять",        "десятьма",        "десяти"        ],
     [ "одинадцять",    "одинадцяти",    "одинадцяти",    "одинадцять",    "одинадцятьма",    "одинадцяти"    ],
     [ "дванадцять",    "дванадцяти",    "дванадцяти",    "дванадцять",    "дванадцятьма",    "дванадцяти"    ],
     [ "тринадцять",    "тринадцяти",    "тринадцяти",    "тринадцять",    "тринадцятьма",    "тринадцяти"    ],
@@ -222,7 +245,7 @@ const TEENS: [[&str; 6]; 10] = [
     [ "сімнадцять",    "сімнадцяти",    "сімнадцяти",    "сімнадцять",    "сімнадцятьма",    "сімнадцяти"    ],
     [ "вісімнадцять",  "вісімнадцяти",  "вісімнадцяти",  "вісімнадцять",  "вісімнадцятьма",  "вісімнадцяти"  ],
     [ "девʼятнадцять", "девʼятнадцяти", "девʼятнадцяти", "девʼятнадцять", "девʼятнадцятьма", "девʼятнадцяти" ],
-];
+];*/
 
 #[rustfmt::skip]
 const TENS: [[&str; 6]; 8] = [
@@ -234,6 +257,10 @@ const TENS: [[&str; 6]; 8] = [
     [ "сімдесят",   "сімдесяти",   "сімдесяти",   "сімдесять",  "сімдесятьма",   "сімдесяти"   ],
     [ "вісімдесят", "вісімдесяти", "вісімдесяти", "вісімдесят", "вісімдесятьма", "вісімдесяти" ],
     [ "девʼяносто", "девʼяноста",  "девʼяноста",  "девʼяносто", "девʼяноста",    "девʼяноста"  ],
+];
+
+const ORDINAL_TENS_BASES: [&str; 9] = [
+    "десят", "двадцят", "тридцят", "сороков", "пʼятдесят", "шістдесят", "сімдесят", "вісімдесят", "девʼяност"
 ];
 
 #[rustfmt::skip]
@@ -249,14 +276,17 @@ const HUNDREDS: [[&str; 6]; 9] = [
     [ "девʼятсот", "девʼятисот",  "девʼятистам",  "девʼятсот", "девʼятьмастами", "девʼятистах"  ],
 ];
 
+const HUNDRED_BASE: &str = "сот";
+
 #[rustfmt::skip]
-const THOUSAND: [[&str; 6]; 2] = [
-    ["тисяча", "тисячі", "тисячі",  "тисячу", "тисячею",  "тисячі"  ],
-    ["тисячі", "тисяч",  "тисячам", "тисячі", "тисячами", "тисячах" ],
+const THOUSAND_FLEXIONS: [[&str; 6]; 2] = [
+    [ "а", "і", "і",  "у", "ею",  "і"  ],
+    [ "і", "",  "ам", "і", "ами", "ах" ],
 ];
 
 // Number names by "rule n-1" from https://uk.wikipedia.org/wiki/Іменні_назви_степенів_тисячі
-const MEGA_BASES: [&str; 20] = [
+const MEGA_BASES: [&str; 21] = [
+    "тисяч",
     "мільйон",
     "мільярд",
     "трильйон",
@@ -280,14 +310,35 @@ const MEGA_BASES: [&str; 20] = [
 ];
 
 #[rustfmt::skip]
-const MEGA_DESINENSES: [[&str; 6]; 2] = [
+const MEGA_FLEXIONS: [[&str; 6]; 2] = [
     [ "",  "а",  "у",  "",  "ом",  "і" ],
     [ "и", "ів", "ам", "и", "ами", "и" ],
 ];
 
-impl Ukrainian {
-    #![allow(dead_code)]
+#[rustfmt::skip]
+const ORDINAL_HARD_FLEXIONS_SINGULAR: [[&str; 6]; 3] = [
+    ["ий", "ого", "ому", "ий", "им",  "ому" ],
+    ["а",  "ої",  "ій",  "у",  "ою",  "ій"  ],
+    ["е",  "ого", "ому", "е",  "им",  "ому" ], 
+];
 
+const ORDINAL_HARD_FLEXIONS_PLURAL: [&str; 6] = [
+    "і",  "их",  "им",  "их", "ими", "их",
+];
+
+#[rustfmt::skip]
+const ORDINAL_SOFT_FLEXIONS_SINGULAR: [[&str; 6]; 3] = [
+    ["ій", "ього", "ьому", "ій", "ім",  "ьому" ],
+    ["я",  "ьої",  "ій",   "ю",  "ьою", "ій"   ],
+    ["є",  "ього", "ьому", "є",  "ім",  "ьому" ], 
+];
+
+const ORDINAL_SOFT_FLEXIONS_PLURAL: [&str; 6] = [
+    "і",  "іх",   "ім",   "іх", "іми", "іх"
+];
+
+
+impl Ukrainian {
     pub fn new(gender: Gender, number: GrammaticalNumber, declenation: Declenation) -> Self {
         Self {
             properties: GrammaticalProperties {
@@ -356,38 +407,37 @@ impl Ukrainian {
             .agreement_with_units(tens, units);
 
             if tens == 1 {
-                words.push(String::from(TEENS[units][properties.declenation.index()]));
+                words.push(format!("{}{}", TEENS_BASES[units], TEENS_FLEXIONS[self.properties.declenation.index()]));
             } else {
                 if tens > 1 {
-                    words.push(String::from(TENS[tens - 2][properties.declenation.index()]));
+                    words.push(String::from(TENS[tens - 2][self.properties.declenation.index()]));
                 }
                 if units == 1 || units == 2 {
                     words.push(String::from(
-                        GENDERED[units - 1][properties.gender.index()]
-                            [properties.declenation.index()],
+                        GENDERED[units - 1][self.properties.gender.index()]
+                            [self.properties.declenation.index()],
                     ));
                 } else if units > 0 {
                     words.push(String::from(
-                        UNITS[units - 3][properties.declenation.index()],
+                        UNITS[units - 3][self.properties.declenation.index()],
                     ));
                 }
             }
 
             if i != 0 && triplet != &0 {
-                if i + 1 > MEGA_BASES.len() {
+                if i > MEGA_BASES.len() {
                     return Err(Num2Err::CannotConvert);
                 }
-                if i == 1 {
-                    words.push(String::from(
-                        THOUSAND[properties.number.index()][properties.declenation.index()],
-                    ))
+                let mega_flexion = if i==1 {
+                    THOUSAND_FLEXIONS[properties.number.index()][properties.declenation.index()]
                 } else {
-                    words.push(format!(
-                        "{}{}",
-                        MEGA_BASES[i - 2],
-                        MEGA_DESINENSES[properties.number.index()][properties.declenation.index()]
-                    ));
-                }
+                    MEGA_FLEXIONS[properties.number.index()][properties.declenation.index()]
+                };
+                words.push(
+                    format!("{}{}",
+                    MEGA_BASES[i - 1],
+                    mega_flexion
+                ));
             }
         }
 
@@ -396,27 +446,18 @@ impl Ukrainian {
 
     fn float_to_cardinal(&self, _num: BigFloat) -> Result<String, Num2Err> {
         todo!()
-        /*let integral_part = num.int();
-        let mut words: Vec<String> = vec![];
+    }
 
-        if !integral_part.is_zero() {
-            let integral_word = self.int_to_cardinal(integral_part)?;
-            words.push(integral_word);
-        }
-
-        let mut ordinal_part = num.frac();
-        if !ordinal_part.is_zero() {
-            words.push(String::from("point"));
-        }
-        while !ordinal_part.is_zero() {
-            let digit = (ordinal_part * BigFloat::from(10)).int();
-            ordinal_part = (ordinal_part * BigFloat::from(10)).frac();
-            words.push(match digit.to_u64().unwrap() {
-                0 => String::from(if self.prefer_oh { "oh" } else { "zero" }),
-                i => String::from(UNITS[i as usize - 1]),
-            });
-        }
-        Ok(words.join(" "))*/
+    fn ordinal_flexion(&self, num: BigFloat) -> &'static str {
+        let tail = (num % BigFloat::from(100)).to_u64().unwrap();
+        let ends_with_3 = tail%10==3 && tail!=13; //третій - the only soft adjective in numbers        
+        let f = match (self.properties.number, ends_with_3) {
+            (GrammaticalNumber::Plural, true) => ORDINAL_SOFT_FLEXIONS_PLURAL,
+            (GrammaticalNumber::Plural, false) => ORDINAL_HARD_FLEXIONS_PLURAL,
+            (_, true) => ORDINAL_SOFT_FLEXIONS_SINGULAR[self.properties.gender.index()],
+            (_, false) => ORDINAL_HARD_FLEXIONS_SINGULAR[self.properties.gender.index()],
+        };
+        f[self.properties.declenation.index()]
     }
 }
 
@@ -436,76 +477,128 @@ impl Language for Ukrainian {
         }
     }
 
-    fn to_ordinal(&self, _num: BigFloat) -> Result<String, Num2Err> {
-        todo!()
-        /*let cardinal_word = self.to_cardinal(num)?;
+    fn to_ordinal(&self, mut num: BigFloat) -> Result<String, Num2Err> {
+        let flexion = self.ordinal_flexion(num);
 
-        let mut words: Vec<String> = vec![];
-        let mut split = cardinal_word.split_whitespace().peekable();
+        // special case zero
+        if num.is_zero() {
+            return Ok(format!("{ORDINAL_ZERO_BASE}{flexion}"));
+        }
 
-        while let Some(w) = split.next() {
-            if split.peek().is_some() {
-                // not last word, no modification needed
-                words.push(String::from(w));
-            } else {
-                // last word, needs to be processed
-                let mut prefix = String::from("");
-                let mut suffix = String::from(w);
+        // handling negative values
+        let mut words = vec![];
+        if num.is_negative() {
+            words.push(String::from(MINUS));
+            num = -num;
+        }
 
-                if w.contains('-') {
-                    // e.g. forty-two => forty-second
-                    let mut w_split = w.split('-');
+        let triplets = self.split_thousands(num);
+        let last_non_empty = triplets.iter().position(|&t|t!=0).unwrap();
 
-                    if let Some(pre) = w_split.next() {
-                        prefix = format!("{}-", pre);
+        // iterate over thousands
+        for (i, triplet) in triplets.iter().enumerate().rev() {
+            let hundreds = (triplet / 100 % 10) as usize;
+            let tens = (triplet / 10 % 10) as usize;
+            let units = (triplet % 10) as usize;
+
+            if i == last_non_empty {
+                if i!=0 {
+                    //п’ятсоттридцятитрьохтисячний
+                    let mut word = String::new();
+                    if hundreds>0 {
+                        word.push_str(HUNDREDS[hundreds-1][Declenation::Genitive.index()]);
                     }
-
-                    if let Some(suf) = w_split.next() {
-                        suffix = String::from(suf);
-                    }
-                }
-
-                suffix = match suffix.as_str() {
-                    "one" => String::from("first"),
-                    "two" => String::from("second"),
-                    "three" => String::from("third"),
-                    "four" => String::from("fourth"),
-                    "five" => String::from("fifth"),
-                    "six" => String::from("sixth"),
-                    "seven" => String::from("seventh"),
-                    "eight" => String::from("eighth"),
-                    "nine" => String::from("ninth"),
-                    "ten" => String::from("tenth"),
-                    "eleven" => String::from("eleventh"),
-                    "twelve" => String::from("twelfth"),
-                    _ => {
-                        if suffix.ends_with('y') {
-                            format!("{}ieth", &suffix[..suffix.len() - 1])
-                        } else {
-                            format!("{}th", suffix)
+                    if tens==1 {
+                        word.push_str(&format!("{}{}", TEENS_BASES[units], TEENS_FLEXIONS[Declenation::Genitive.index()]));
+                    } else {
+                        if tens>1 {
+                            word.push_str(TENS[tens-2][Declenation::Genitive.index()]);
+                        }
+                        match units {
+                            1 => word.push_str(ONE_BASE),
+                            2 => word.push_str(GENDERED[1][Gender::Masculine.index()][Declenation::Genitive.index()]),
+                            3..=9 => word.push_str(UNITS[units-3][Declenation::Genitive.index()]),
+                            _ => (),
                         }
                     }
-                };
+                    word.push_str(&format!("{}н{flexion}", MEGA_BASES[i-1]));
+                    words.push(word);
+                } else if tens==0 && units==0 {
+                    words.push(format!("{HUNDRED_BASE}{flexion}"));
+                } else {
+                    if hundreds>0 {
+                        words.push(String::from(HUNDREDS[hundreds-1][Declenation::Nominative.index()]));
+                    }
+                    if tens==1 {
+                        words.push(format!("{}{flexion}", TEENS_BASES[units]));
+                    } else if units==0 {
+                        words.push(format!("{}{flexion}", ORDINAL_TENS_BASES[tens-1]));
+                    } else {
+                        if tens>1 {
+                            words.push(String::from(TENS[tens-2][Declenation::Nominative.index()]));
+                        }
+                        let flexion = self.ordinal_flexion(BigFloat::from(units as u8));
+                        words.push(format!("{}{flexion}", ORDINAL_UNIT_BASES[units-1]));
+                    }                        
+                }
+                break;
+            }
 
-                words.push(format!("{}{}", prefix, suffix))
+            if hundreds > 0 {
+                words.push(String::from(
+                    HUNDREDS[hundreds - 1][Declenation::Nominative.index()],
+                ));
+            }
+
+            let properties = GrammaticalProperties {
+                gender: match i {
+                    1 => Gender::Feminine, //тисяча жіночого роду
+                    _ => Gender::Masculine,
+                },
+                number: GrammaticalNumber::Singular,
+                declenation: Declenation::Nominative,
+            }
+            .agreement_with_units(tens, units);
+
+            if tens == 1 {
+                words.push(format!("{}{}", TEENS_BASES[units], TEENS_FLEXIONS[Declenation::Nominative.index()]));
+            } else {
+                if tens > 1 {
+                    words.push(String::from(TENS[tens - 2][Declenation::Nominative.index()]));
+                }
+                if units == 1 || units == 2 {
+                    words.push(String::from(
+                        GENDERED[units - 1][properties.gender.index()]
+                            [Declenation::Nominative.index()],
+                    ));
+                } else if units > 0 {
+                    words.push(String::from(
+                        UNITS[units - 3][Declenation::Nominative.index()],
+                    ));
+                }
+            }
+
+            if i != 0 && triplet != &0 {
+                let mega_flexion = if i==1 {
+                    THOUSAND_FLEXIONS[properties.number.index()][properties.declenation.index()]
+                } else {
+                    MEGA_FLEXIONS[properties.number.index()][properties.declenation.index()]
+                };
+                words.push(
+                    format!("{}{}",
+                    MEGA_BASES[i - 1],
+                    mega_flexion
+                ));
+
             }
         }
 
-        Ok(words.join(" "))*/
+        Ok(words.join(" "))
     }
 
-    fn to_ordinal_num(&self, _num: BigFloat) -> Result<String, Num2Err> {
-        todo!()
-        /*Ok(format!(
-            "{}{}",
-            num.to_u128().unwrap(),
-            match (num % BigFloat::from(10)).to_u64().unwrap() {
-                1 => "st",
-                2 => "nd",
-                3 => "rd",
-                _ => "th",
-            }
-        ))*/
+    fn to_ordinal_num(&self, num: BigFloat) -> Result<String, Num2Err> {
+        let flexion = self.ordinal_flexion(num);
+        Ok(format!("{}-{flexion}", num.to_u128().unwrap()))
     }
 
     fn to_year(&self, _num: BigFloat) -> Result<String, Num2Err> {
@@ -647,6 +740,57 @@ mod tests {
             Num2Words::new(918654321).lang(Lang::Ukrainian).prefer("ч").prefer("о").cardinal().to_words(),
             Ok(String::from("девʼятьмастами вісімнадцятьма мільйонами шістьмастами пʼятдесятьма чотирма тисячами трьомастами двадцятьма одним"))
         );
+        assert_eq!(
+            Num2Words::new(18000000).lang(Lang::Ukrainian).cardinal().to_words(),
+            Ok(String::from("вісімнадцять мільйонів"))
+        );
+
+    }
+
+    #[test]
+    fn test_ordinal_num() {
+        assert_eq!(
+            Num2Words::new(0)
+                .lang(Lang::Ukrainian)
+                .ordinal_num()
+                .to_words(),
+            Ok(String::from("0-ий"))
+        );
+        assert_eq!(
+            Num2Words::new(23)
+                .lang(Lang::Ukrainian)
+                .ordinal_num()
+                .prefer("ж")
+                .prefer("орудний")
+                .to_words(),
+            Ok(String::from("23-ьою"))
+        );
+        assert_eq!(
+            Num2Words::new(1000)
+                .lang(Lang::Ukrainian)
+                .ordinal_num()
+                .prefer("множина")
+                .prefer("давальний")
+                .to_words(),
+            Ok(String::from("1000-им"))
+        );
+        assert_eq!(
+            Num2Words::new(13)
+                .lang(Lang::Ukrainian)
+                .ordinal_num()
+                .prefer("множина")
+                .prefer("давальний")
+                .to_words(),
+            Ok(String::from("13-им"))
+        );
+        assert_eq!(
+            Num2Words::new(321)
+                .lang(Lang::Ukrainian)
+                .ordinal_num()
+                .prefer("жіночий")
+                .to_words(),
+            Ok(String::from("321-а"))
+        );
     }
 
     #[test]
@@ -661,8 +805,9 @@ mod tests {
             GrammaticalProperties {
                 gender: Gender::Masculine,
                 number: GrammaticalNumber::Plural,
-                declenation: Declenation::Nominative
-            }
+                declenation: Declenation::Genitive
+            },
+            "failed agreement: 0"
         );
         assert_eq!(
             GrammaticalProperties {
@@ -675,7 +820,8 @@ mod tests {
                 gender: Gender::Masculine,
                 number: GrammaticalNumber::Singular,
                 declenation: Declenation::Nominative
-            }
+            },
+            "failed agreement: 1"
         );
         assert_eq!(
             GrammaticalProperties {
@@ -687,8 +833,9 @@ mod tests {
             GrammaticalProperties {
                 gender: Gender::Feminine,
                 number: GrammaticalNumber::Plural,
-                declenation: Declenation::Genitive
-            }
+                declenation: Declenation::Nominative
+            },
+            "failed agreement: 82"
         );
         assert_eq!(
             GrammaticalProperties {
@@ -701,7 +848,8 @@ mod tests {
                 gender: Gender::Masculine,
                 number: GrammaticalNumber::Plural,
                 declenation: Declenation::Dative
-            }
+            },
+            "failed agreement: 11"
         );
         assert_eq!(
             GrammaticalProperties {
@@ -714,7 +862,91 @@ mod tests {
                 gender: Gender::Feminine,
                 number: GrammaticalNumber::Plural,
                 declenation: Declenation::Instrumental
+            },
+            "failed agreement: 54"
+        );
+        assert_eq!(
+            GrammaticalProperties {
+                gender: Gender::Masculine,
+                number: GrammaticalNumber::Singular,
+                declenation: Declenation::Nominative
             }
+            .agreement_with_units(1, 8),
+            GrammaticalProperties {
+                gender: Gender::Masculine,
+                number: GrammaticalNumber::Plural,
+                declenation: Declenation::Genitive
+            },
+            "failed agreement: 18"
+        );
+    }
+
+    #[test]
+    fn test_ordinal() {
+        assert_eq!(
+            Num2Words::new(0)
+                .lang(Lang::Ukrainian)
+                .ordinal()
+                .to_words(),
+            Ok(String::from("нульовий"))
+        );
+        assert_eq!(
+            Num2Words::new(0)
+                .lang(Lang::Ukrainian)
+                .prefer("р")
+                .ordinal()
+                .to_words(),
+            Ok(String::from("нульового"))
+        );
+        assert_eq!(
+            Num2Words::new(1)
+                .lang(Lang::Ukrainian)
+                .prefer("loc")
+                .ordinal()
+                .to_words(),
+            Ok(String::from("першому"))
+        );
+        assert_eq!(
+            Num2Words::new(1)
+                .lang(Lang::Ukrainian)
+                .prefer("f")
+                .ordinal()
+                .to_words(),
+            Ok(String::from("перша"))
+        );
+        assert_eq!(
+            Num2Words::new(1)
+                .lang(Lang::Ukrainian)
+                .prefer("f")
+                .prefer("ins")
+                .ordinal()
+                .to_words(),
+            Ok(String::from("першою"))
+        );
+        assert_eq!(
+            Num2Words::new(2)
+                .lang(Lang::Ukrainian)
+                .prefer("f")
+                .prefer("acc")
+                .ordinal()
+                .to_words(),
+            Ok(String::from("другу"))
+        );
+        assert_eq!(
+            Num2Words::new(918654321).lang(Lang::Ukrainian).prefer("f").prefer("dat").ordinal().to_words(),
+            Ok(String::from("девʼятсот вісімнадцять мільйонів шістсот пʼятдесят чотири тисячі триста двадцять першій"))
+        );
+        assert_eq!(
+            Num2Words::new(918654321).lang(Lang::Ukrainian).prefer("ч").prefer("о").ordinal().to_words(),
+            Ok(String::from("девʼятсот вісімнадцять мільйонів шістсот пʼятдесят чотири тисячі триста двадцять першим"))
+        );
+        assert_eq!(
+            Num2Words::new(123456000).lang(Lang::Ukrainian).ordinal().to_words(),
+            Ok(String::from("сто двадцять три мільйони чотирьохсотпʼятдесятишеститисячний"))
+        );
+        assert_eq!(
+            Num2Words::new(1000000).lang(Lang::Ukrainian).ordinal().to_words(),
+            Ok(String::from("одномільйонний"))
         );
     }
 }

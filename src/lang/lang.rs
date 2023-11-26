@@ -61,18 +61,18 @@ pub fn to_language(lang: Lang, preferences: Vec<String>) -> Box<dyn Language> {
         Lang::Ukrainian => {
             let declenation: lang::uk::Declenation = preferences
                 .iter()
-                .filter_map(|d| d.parse().ok())
-                .last()
+                .rev()
+                .find_map(|d| d.parse().ok())
                 .unwrap_or_default();
             let gender: lang::uk::Gender = preferences
                 .iter()
-                .filter_map(|d| d.parse().ok())
-                .last()
+                .rev()
+                .find_map(|d| d.parse().ok())
                 .unwrap_or_default();
             let number: lang::uk::GrammaticalNumber = preferences
                 .iter()
-                .filter_map(|d| d.parse().ok())
-                .last()
+                .rev()
+                .find_map(|d| d.parse().ok())
                 .unwrap_or_default();
             Box::new(lang::Ukrainian::new(gender, number, declenation))
         }
