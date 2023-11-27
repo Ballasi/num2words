@@ -47,8 +47,8 @@ pub fn to_language(lang: Lang, preferences: Vec<String>) -> Box<dyn Language> {
         Lang::English => {
             let last = preferences
                 .iter()
-                .filter(|v| vec!["oh", "nil"].contains(&v.as_str()))
-                .last();
+                .rev()
+                .find(|v| ["oh", "nil"].contains(&v.as_str()));
 
             if let Some(v) = last {
                 return Box::new(lang::English::new(v == "oh", v == "nil"));
