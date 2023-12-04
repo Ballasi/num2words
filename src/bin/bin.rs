@@ -22,6 +22,7 @@ GLOBAL OPTIONS:
 
 AVAILABLE LANGUAGES:
     en: English
+    uk: Ukrainian
 
 AVAILABLE OUTPUTS:
     cardinal:      forty-two (42)

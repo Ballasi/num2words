@@ -254,12 +254,19 @@ impl Num2Words {
 
     /// Adds a preference parameter
     ///
+    /// Ukrainian language supports number (i.e. singular), gender (i.e. feminine),
+    /// and declenation (i.e. accusative) both in English and Ukrainian
+    ///
     /// Example:
     /// ```
-    /// use num2words::{Num2Words, Currency};
+    /// use num2words::{Num2Words, Lang};
     /// assert_eq!(
     ///     Num2Words::new(0.05).prefer("oh").to_words(),
     ///     Ok(String::from("point oh five"))
+    /// );
+    /// assert_eq!(
+    ///     Num2Words::new(51).lang(Lang::Ukrainian).prefer("орудний").to_words(),
+    ///     Ok(String::from("пʼятдесятьма одним"))
     /// );
     /// ```
     pub fn prefer<T>(mut self, prefer: T) -> Self
