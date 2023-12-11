@@ -254,8 +254,16 @@ impl Num2Words {
 
     /// Adds a preference parameter
     ///
-    /// Ukrainian language supports number (i.e. singular), gender (i.e. feminine),
-    /// and declenation (i.e. accusative) both in English and Ukrainian
+    /// # English language accepts:
+    /// oh and/or nil as replacements for "zero"
+    ///
+    /// # Ukrainian language supports grammatical categories (bold - default):
+    /// Number: **singular/sing/однина/од**, plural/pl/множина/мн
+    ///
+    /// Gender: **masculine/m/чоловічий/чол/ч**, feminine/f/жіночий/жін/ж, neuter/n/середній/сер/с
+    ///
+    /// Declenation: **nominative/nom/називний/н**, genitive/gen/родовий/р, dative/dat/давальний/д,
+    /// accusative/acc/знахідний/з, instrumental/inc/орудний/о, locative/loc/місцевий/м
     ///
     /// Example:
     /// ```
