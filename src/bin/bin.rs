@@ -38,7 +38,7 @@ fn get_version() -> String {
     let version = env!("CARGO_PKG_VERSION");
     let mut words = vec![];
 
-    for num in version.split(".") {
+    for num in version.split('.') {
         if let Ok(i) = String::from(num).parse::<i64>() {
             if let Ok(word) = Num2Words::new(i).prefer("oh").to_words() {
                 words.push(word);
@@ -55,69 +55,66 @@ fn help() {
 
 fn handle_cmd(n: String, mut args: std::env::Args) {
     if let Some(mut num) = Num2Words::parse(&n) {
-        loop {
-            match args.next() {
-                Some(arg) => match arg.as_str() {
-                    "--lang" | "-l" => match args.next() {
-                        Some(l) => {
-                            if let Ok(v) = Lang::from_str(l.as_str()) {
-                                num = num.lang(v);
-                            } else {
-                                eprintln!("Error: invalid language");
-                                return;
-                            }
-                        }
-                        None => {
-                            help();
+        while let Some(arg) = args.next() {
+            match arg.as_str() {
+                "--lang" | "-l" => match args.next() {
+                    Some(l) => {
+                        if let Ok(v) = Lang::from_str(l.as_str()) {
+                            num = num.lang(v);
+                        } else {
+                            eprintln!("Error: invalid language");
                             return;
                         }
-                    },
-                    "--prefer" | "-p" => match args.next() {
-                        Some(p) => num = num.prefer(p),
-                        None => {
-                            help();
-                            return;
-                        }
-                    },
-                    "--to" | "-t" => match args.next() {
-                        Some(t) => {
-                            if let Ok(v) = Currency::from_str(t.as_str()) {
-                                num = num.currency(v);
-                            } else {
-                                match t.as_str() {
-                                    "cardinal" => {
-                                        num = num.cardinal();
-                                    }
-                                    "ordinal" => {
-                                        num = num.ordinal();
-                                    }
-                                    "ordinal_num" => {
-                                        num = num.ordinal_num();
-                                    }
-                                    "year" => {
-                                        num = num.year();
-                                    }
-                                    _ => {
-                                        eprintln!("Error: invalid to tag");
-                                        return;
-                                    }
+                    }
+                    None => {
+                        help();
+                        return;
+                    }
+                },
+                "--prefer" | "-p" => match args.next() {
+                    Some(p) => num = num.prefer(p),
+                    None => {
+                        help();
+                        return;
+                    }
+                },
+                "--to" | "-t" => match args.next() {
+                    Some(t) => {
+                        if let Ok(v) = Currency::from_str(t.as_str()) {
+                            num = num.currency(v);
+                        } else {
+                            match t.as_str() {
+                                "cardinal" => {
+                                    num = num.cardinal();
+                                }
+                                "ordinal" => {
+                                    num = num.ordinal();
+                                }
+                                "ordinal_num" => {
+                                    num = num.ordinal_num();
+                                }
+                                "year" => {
+                                    num = num.year();
+                                }
+                                _ => {
+                                    eprintln!("Error: invalid to tag");
+                                    return;
                                 }
                             }
                         }
-                        None => {
-                            help();
-                            return;
-                        }
-                    },
-                    _ => continue,
+                    }
+                    None => {
+                        help();
+                        return;
+                    }
                 },
-                None => break,
+                _ => continue,
             }
         }
 
         match num.to_words() {
             Ok(v) => println!("{}", v),
-            Err(err) => eprintln!("Error: {}", err.to_string()),
+            Err(err) => eprintln!("Error: {}", err),
         }
     } else {
         eprintln!("Error: cannot parse number");

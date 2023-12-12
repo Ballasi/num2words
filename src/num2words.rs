@@ -319,13 +319,7 @@ mod tests {
 
     #[test]
     fn test_string_not_valid() {
-        match Num2Words::parse("not a number") {
-            Some(_) => assert!(false),
-            None => assert!(true),
-        }
-        match Num2Words::parse("NAN") {
-            Some(_) => assert!(false),
-            None => assert!(true),
-        }
+        assert!(Num2Words::parse("not a number").is_none());
+        assert!(Num2Words::parse("NAN").is_none());
     }
 }

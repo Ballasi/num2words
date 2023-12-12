@@ -6,15 +6,15 @@ pub struct English {
     prefer_nil: bool,
 }
 
-const UNITS: [&'static str; 9] = [
+const UNITS: [&str; 9] = [
     "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
 ];
 
-const TENS: [&'static str; 9] = [
+const TENS: [&str; 9] = [
     "ten", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety",
 ];
 
-const TEENS: [&'static str; 10] = [
+const TEENS: [&str; 10] = [
     "ten",
     "eleven",
     "twelve",
@@ -30,7 +30,7 @@ const TEENS: [&'static str; 10] = [
 // As defined by the AHD4, CED, RHD2, W3 and UM authorities
 // For more information, see
 // https://en.wikipedia.org/wiki/Names_of_large_numbers
-const MEGAS: [&'static str; 21] = [
+const MEGAS: [&str; 21] = [
     "thousand",
     "million",
     "billion",
@@ -247,13 +247,15 @@ impl Language for English {
     }
 
     fn to_ordinal_num(&self, num: BigFloat) -> Result<String, Num2Err> {
+        let tail = (num % BigFloat::from(100)).to_u64().unwrap();
+        let last = tail % 10;
         Ok(format!(
             "{}{}",
             num.to_u128().unwrap(),
-            match (num % BigFloat::from(10)).to_u64().unwrap() {
-                1 => "st",
-                2 => "nd",
-                3 => "rd",
+            match (tail / 10 != 1, last) {
+                (true, 1) => "st",
+                (true, 2) => "nd",
+                (true, 3) => "rd",
                 _ => "th",
             }
         ))
@@ -405,6 +407,13 @@ mod tests {
                 .ordinal_num()
                 .to_words(),
             Ok(String::from("10th"))
+        );
+        assert_eq!(
+            Num2Words::new(13)
+                .lang(Lang::English)
+                .ordinal_num()
+                .to_words(),
+            Ok(String::from("13th"))
         );
         assert_eq!(
             Num2Words::new(21)
@@ -607,7 +616,7 @@ mod tests {
                     .lang(Lang::English)
                     .cardinal()
                     .to_words(),
-                Ok(String::from(format!("one {}", m)))
+                Ok(format!("one {}", m))
             );
         }
 
