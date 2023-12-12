@@ -4,12 +4,12 @@ use std::str::FromStr;
 
 // Source: Ukrainian Orthography 2019 / Український Правопис 2019
 // § 38. Constructed numerals / Складні числівники
-// § 105. Cardinal numerals declination / Відмінювання кількісних числівників
-// § 106. Ordinal numerals declination / Відмінювання порядкових числівників
-// § 107. Fractional numerals declination / Відмінювання дробових числівників
+// § 105. Cardinal numerals declension / Відмінювання кількісних числівників
+// § 106. Ordinal numerals declension / Відмінювання порядкових числівників
+// § 107. Fractional numerals declension / Відмінювання дробових числівників
 
 #[derive(Default, Clone, Copy, PartialEq, Debug)]
-pub enum Declination {
+pub enum Declension {
     #[default]
     Nominative,
     Genitive,
@@ -19,9 +19,9 @@ pub enum Declination {
     Locative,
 }
 
-impl Declination {
+impl Declension {
     fn index(&self) -> usize {
-        use Declination::*;
+        use Declension::*;
         match self {
             Nominative => 0,
             Genitive => 1,
@@ -33,11 +33,11 @@ impl Declination {
     }
 }
 
-impl FromStr for Declination {
+impl FromStr for Declension {
     type Err = ();
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        use Declination::*;
+        use Declension::*;
 
         Ok(match s.to_lowercase().as_str() {
             "н" | "називний" | "nom" | "nominative" => Nominative,
@@ -118,7 +118,7 @@ impl GrammaticalNumber {
 pub struct Ukrainian {
     gender: Gender,
     number: GrammaticalNumber,
-    declination: Declination,
+    declension: Declension,
 }
 
 impl Ukrainian {
@@ -134,9 +134,9 @@ impl Ukrainian {
             ..*self
         }
     }
-    fn set_declination(&self, declination: Declination) -> Self {
+    fn set_declension(&self, declension: Declension) -> Self {
         Self {
-            declination,
+            declension,
             ..*self
         }
     }
@@ -166,8 +166,8 @@ impl Ukrainian {
 
     fn agreement_with_units(&self, tens: usize, units: usize) -> Ukrainian {
         if units == 0 || units > 4 || tens == 1 {
-            if self.declination == Declination::Nominative {
-                self.plural().set_declination(Declination::Genitive)
+            if self.declension == Declension::Nominative {
+                self.plural().set_declension(Declension::Genitive)
             } else {
                 self.plural()
             }
@@ -358,25 +358,25 @@ const ORDINAL_SOFT_FLEXIONS_SINGULAR_SHORT: [[&str; 6]; 3] = [
 const ORDINAL_FLEXIONS_PLURAL_SHORT: [&str; 6] = ["і", "х", "м", "х", "ми", "х"];
 
 #[rustfmt::skip]
-const NOUN_2ST_GROUP_HARD_DECLINATIONS: [[&str; 6]; 2] = [ //долар
+const NOUN_2ST_GROUP_HARD_DECLENSIONS: [[&str; 6]; 2] = [ //долар
     [ "",  "а",  "у",  "а", "ом",  "і"  ],
     [ "и", "ів", "ам", "и", "ами", "ах" ],
 ];
 
 #[rustfmt::skip]
-const NOUN_2ST_GROUP_SOFT_DECLINATIONS: [[&str; 6]; 2] = [ //юань
+const NOUN_2ST_GROUP_SOFT_DECLENSIONS: [[&str; 6]; 2] = [ //юань
     [ "ь",  "я",  "ю", "я", "єм",  "і"  ],
     [ "і", "ів", "ям", "і", "ями", "ях" ],
 ];
 
 #[rustfmt::skip]
-const NOUN_1ST_GROUP_SOFT_DECLINATIONS_VOWEL: [[&str; 6]; 2] = [ //рупія
+const NOUN_1ST_GROUP_SOFT_DECLENSIONS_VOWEL: [[&str; 6]; 2] = [ //рупія
     [ "я", "ї", "ї",  "я", "єю",  "ї"  ],
     [ "ї", "й", "ям", "ї", "ями", "ях" ],
 ];
 
 #[rustfmt::skip]
-const NOUN_1ST_GROUP_HARD_DECLINATIONS: [[&str; 6]; 2] = [ //єна
+const NOUN_1ST_GROUP_HARD_DECLENSIONS: [[&str; 6]; 2] = [ //єна
     [ "а", "и", "і",  "а", "ою",  "і"  ],
     [ "и", "",  "ам", "и", "ами", "ах" ],
 ];
@@ -400,21 +400,21 @@ const YEAR: [[&str; 6]; 2] = [
 ];
 
 impl Ukrainian {
-    pub fn new(gender: Gender, number: GrammaticalNumber, declination: Declination) -> Self {
+    pub fn new(gender: Gender, number: GrammaticalNumber, declension: Declension) -> Self {
         Self {
             gender,
             number,
-            declination,
+            declension,
         }
     }
 
     fn currencies(&self, currency: Currency) -> String {
         let number_idx = self.number.index();
-        let declination_idx = self.declination.index();
+        let declension_idx = self.declension.index();
         match currency {
             Currency::AED => format!(
                 "дирхам{}",
-                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declension_idx]
             ),
             Currency::ARS
             | Currency::CLP
@@ -432,103 +432,102 @@ impl Ukrainian {
             | Currency::TWD
             | Currency::USD => format!(
                 "долар{}",
-                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declension_idx]
             ),
             Currency::BRL => format!(
                 "реал{}",
-                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declension_idx]
             ),
             Currency::CHF => format!(
                 "франк{}",
-                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declension_idx]
             ),
             Currency::CNY => format!(
                 "юан{}",
-                NOUN_2ST_GROUP_SOFT_DECLINATIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_SOFT_DECLENSIONS[number_idx][declension_idx]
             ),
             Currency::CRC => format!(
                 "колон{}",
-                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declension_idx]
             ),
             Currency::DINAR | Currency::DZD | Currency::KWD => format!(
                 "динар{}",
-                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declension_idx]
             ),
             Currency::EUR => String::from("євро"),
             Currency::GBP => format!(
                 "фунт{}",
-                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declension_idx]
             ),
             Currency::IDR | Currency::INR => format!(
                 "рупі{}",
-                NOUN_1ST_GROUP_SOFT_DECLINATIONS_VOWEL[number_idx][declination_idx]
+                NOUN_1ST_GROUP_SOFT_DECLENSIONS_VOWEL[number_idx][declension_idx]
             ),
             Currency::ILS => {
                 let adjective_flextion = if self.number == GrammaticalNumber::Plural {
                     ADJECTIVE_HARD_FLEXIONS_PLURAL
                 } else {
                     ADJECTIVE_HARD_FLEXIONS_SINGULAR[Gender::Masculine.index()]
-                }[self.declination.index()];
+                }[self.declension.index()];
                 format!(
                     "нов{} шекел{}",
-                    adjective_flextion,
-                    NOUN_2ST_GROUP_SOFT_DECLINATIONS[number_idx][declination_idx]
+                    adjective_flextion, NOUN_2ST_GROUP_SOFT_DECLENSIONS[number_idx][declension_idx]
                 )
             }
             Currency::JPY => format!(
                 "єн{}",
-                NOUN_1ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
+                NOUN_1ST_GROUP_HARD_DECLENSIONS[number_idx][declension_idx]
             ),
             Currency::KRW => format!(
                 "вон{}",
-                NOUN_1ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
+                NOUN_1ST_GROUP_HARD_DECLENSIONS[number_idx][declension_idx]
             ),
             Currency::KZT => String::from("tenge"),
             Currency::MYR => format!(
                 "рингіт{}",
-                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declension_idx]
             ),
             Currency::NOK => format!(
                 "крон{}",
-                NOUN_1ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
+                NOUN_1ST_GROUP_HARD_DECLENSIONS[number_idx][declension_idx]
             ),
             Currency::PEN => format!(
                 "сол{}",
-                NOUN_2ST_GROUP_SOFT_DECLINATIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_SOFT_DECLENSIONS[number_idx][declension_idx]
             ),
             Currency::PLN => {
                 let flextion = if self.number == GrammaticalNumber::Plural {
                     ADJECTIVE_HARD_FLEXIONS_PLURAL
                 } else {
                     ADJECTIVE_HARD_FLEXIONS_SINGULAR[Gender::Masculine.index()]
-                }[declination_idx];
+                }[declension_idx];
                 format!("злот{}", flextion)
             }
             Currency::QAR | Currency::RIYAL | Currency::SAR => format!(
                 "ріал{}",
-                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declension_idx]
             ),
             Currency::RUB =>
-            //format!("рубл{}", NOUN_1ST_GROUP_MASCULINE_SOFT_DECLINATIONS[number_idx][declination_idx]),
+            //format!("рубл{}", NOUN_1ST_GROUP_MASCULINE_SOFT_DECLENSIONS[number_idx][declension_idx]),
             {
                 String::from("руській воєнний корабль іді нахуй")
             }
             Currency::THB => format!(
                 "бат{}",
-                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declension_idx]
             ),
             Currency::TRY => format!(
                 "куруш{}",
-                NOUN_1ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
+                NOUN_1ST_GROUP_HARD_DECLENSIONS[number_idx][declension_idx]
             ),
-            Currency::UAH => String::from(HRYVNIAS[number_idx][declination_idx]),
+            Currency::UAH => String::from(HRYVNIAS[number_idx][declension_idx]),
             Currency::VND => format!(
                 "донг{}",
-                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declension_idx]
             ),
             Currency::ZAR => format!(
                 "ранд{}",
-                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declension_idx]
             ),
             //_ => currency.default_string(self.number == GrammaticalNumber::Plural),
         }
@@ -548,11 +547,11 @@ impl Ukrainian {
 
     fn currency_fraction(&self, currency: Currency) -> String {
         let number_idx = self.number.index();
-        let declination_idx = self.declination.index();
+        let declension_idx = self.declension.index();
         match currency {
             Currency::AED => format!(
                 "філс{}",
-                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declension_idx]
             ),
             Currency::ARS
             | Currency::CLP
@@ -571,85 +570,85 @@ impl Ukrainian {
             | Currency::TWD
             | Currency::USD => format!(
                 "цент{}",
-                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declension_idx]
             ),
             Currency::CHF => format!(
                 "сантим{}",
-                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declension_idx]
             ),
             Currency::CNY => format!(
                 "фен{}",
-                NOUN_2ST_GROUP_SOFT_DECLINATIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_SOFT_DECLENSIONS[number_idx][declension_idx]
             ),
             Currency::CRC => String::from("сантимо"),
             Currency::DINAR | Currency::DZD | Currency::KWD => format!(
                 "філс{}",
-                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declension_idx]
             ),
             Currency::EUR => format!(
                 "євроцент{}",
-                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declension_idx]
             ),
             Currency::GBP => format!(
                 "пенс{}",
-                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declension_idx]
             ),
             Currency::IDR => format!(
                 "сен{}",
-                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declension_idx]
             ),
             Currency::INR => format!(
                 "пайс{}",
-                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declension_idx]
             ),
             Currency::ILS => format!(
                 "агор{}",
-                NOUN_1ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
+                NOUN_1ST_GROUP_HARD_DECLENSIONS[number_idx][declension_idx]
             ),
             Currency::JPY => format!(
                 "сен{}",
-                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declension_idx]
             ),
             Currency::KRW => format!(
                 "чон{}",
-                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declension_idx]
             ),
             Currency::KZT => format!(
                 "тиїн{}",
-                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declension_idx]
             ),
             Currency::MYR => format!(
                 "сен{}",
-                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declension_idx]
             ),
             Currency::NOK => String::from("оре"),
             Currency::PEN => String::from("сентімо"),
             Currency::PLN => format!(
                 "грош{}",
-                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declension_idx]
             ),
             Currency::QAR | Currency::RIYAL | Currency::SAR => format!(
                 "філс{}",
-                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declension_idx]
             ),
             Currency::RUB =>
-            //format!("копійк{}", NOUN_1ST_GROUP_FEMININE_HARD_DECLINATIONS[number_idx][declination_idx]),
+            //format!("копійк{}", NOUN_1ST_GROUP_FEMININE_HARD_DECLENSIONS[number_idx][declension_idx]),
             {
                 String::from("руській воєнний корабль іді нахуй")
             }
             Currency::THB => format!(
                 "cатанг{}",
-                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declension_idx]
             ),
             Currency::TRY => format!(
                 "лір{}",
-                NOUN_1ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
+                NOUN_1ST_GROUP_HARD_DECLENSIONS[number_idx][declension_idx]
             ),
-            Currency::UAH => String::from(KOPIYKAS[number_idx][declination_idx]),
+            Currency::UAH => String::from(KOPIYKAS[number_idx][declension_idx]),
             Currency::VND => String::from("су"),
             Currency::ZAR => format!(
                 "цент{}",
-                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declension_idx]
             ),
             //_ => currency.default_cent_string(self.number == GrammaticalNumber::Plural)
         }
@@ -677,7 +676,7 @@ impl Ukrainian {
     fn int_to_cardinal(&self, mut num: BigFloat) -> Result<String, Num2Err> {
         // special case zero
         if num.is_zero() {
-            return Ok(String::from(ZERO[self.declination.index()]));
+            return Ok(String::from(ZERO[self.declension.index()]));
         }
 
         // handling negative values
@@ -695,7 +694,7 @@ impl Ukrainian {
 
             if hundreds > 0 {
                 words.push(String::from(
-                    HUNDREDS[hundreds - 1][self.declination.index()],
+                    HUNDREDS[hundreds - 1][self.declension.index()],
                 ));
             }
 
@@ -710,19 +709,19 @@ impl Ukrainian {
                 words.push(format!(
                     "{}{}",
                     TEENS_BASES[units],
-                    TEENS_FLEXIONS[self.declination.index()]
+                    TEENS_FLEXIONS[self.declension.index()]
                 ));
             } else {
                 if tens > 1 {
-                    words.push(String::from(TENS[tens - 2][self.declination.index()]));
+                    words.push(String::from(TENS[tens - 2][self.declension.index()]));
                 }
                 if units == 1 || units == 2 {
                     let props = if order == 0 { self } else { &properties };
                     words.push(String::from(
-                        GENDERED[units - 1][props.gender.index()][props.declination.index()],
+                        GENDERED[units - 1][props.gender.index()][props.declension.index()],
                     ));
                 } else if units > 0 {
-                    words.push(String::from(UNITS[units - 3][self.declination.index()]));
+                    words.push(String::from(UNITS[units - 3][self.declension.index()]));
                 }
             }
 
@@ -731,9 +730,9 @@ impl Ukrainian {
                     return Err(Num2Err::CannotConvert);
                 }
                 let mega_flexion = if order == 1 {
-                    THOUSAND_FLEXIONS[properties.number.index()][properties.declination.index()]
+                    THOUSAND_FLEXIONS[properties.number.index()][properties.declension.index()]
                 } else {
-                    MEGA_FLEXIONS[properties.number.index()][properties.declination.index()]
+                    MEGA_FLEXIONS[properties.number.index()][properties.declension.index()]
                 };
                 words.push(format!("{}{}", MEGA_BASES[order - 1], mega_flexion));
             }
@@ -759,7 +758,7 @@ impl Ukrainian {
             ADJECTIVE_HARD_FLEXIONS_PLURAL
         } else {
             ADJECTIVE_HARD_FLEXIONS_SINGULAR[Gender::Feminine.index()]
-        }[whole_properties.declination.index()];
+        }[whole_properties.declension.index()];
 
         let whole_lang = whole_properties.feminine();
         let numerator_properties = self.agreement_with_num(numerator);
@@ -782,7 +781,7 @@ impl Ukrainian {
             (false, true) => &ADJECTIVE_SOFT_FLEXIONS_SINGULAR[self.gender.index()],
             (false, false) => &ADJECTIVE_HARD_FLEXIONS_SINGULAR[self.gender.index()],
         };
-        f[self.declination.index()]
+        f[self.declension.index()]
     }
 
     fn ordinal_flexion_short(&self, num: BigFloat) -> &'static str {
@@ -797,16 +796,16 @@ impl Ukrainian {
                 &ORDINAL_HARD_FLEXIONS_SINGULAR_SHORT[self.gender.index()]
             }
         };
-        f[self.declination.index()]
+        f[self.declension.index()]
     }
 }
 
 impl Language for Ukrainian {
     fn to_cardinal(&self, num: BigFloat) -> Result<String, Num2Err> {
         if num.is_inf_pos() {
-            Ok(String::from(INFINITY[self.declination.index()]))
+            Ok(String::from(INFINITY[self.declension.index()]))
         } else if num.is_inf_neg() {
-            Ok(format!("{MINUS} {}", INFINITY[self.declination.index()]))
+            Ok(format!("{MINUS} {}", INFINITY[self.declension.index()]))
         } else if num.frac().is_zero() {
             self.int_to_cardinal(num)
         } else {
@@ -851,25 +850,25 @@ impl Language for Ukrainian {
                     //п’ятсоттридцятитрьохтисячний
                     let mut word = String::new();
                     if hundreds > 0 {
-                        word.push_str(HUNDREDS[hundreds - 1][Declination::Genitive.index()]);
+                        word.push_str(HUNDREDS[hundreds - 1][Declension::Genitive.index()]);
                     }
                     if tens == 1 {
                         word.push_str(&format!(
                             "{}{}",
                             TEENS_BASES[units],
-                            TEENS_FLEXIONS[Declination::Genitive.index()]
+                            TEENS_FLEXIONS[Declension::Genitive.index()]
                         ));
                     } else {
                         if tens > 1 {
-                            word.push_str(TENS[tens - 2][Declination::Genitive.index()]);
+                            word.push_str(TENS[tens - 2][Declension::Genitive.index()]);
                         }
                         match units {
                             1 => word.push_str(ONE_BASE),
                             2 => word.push_str(
                                 GENDERED[1][Gender::Masculine.index()]
-                                    [Declination::Genitive.index()],
+                                    [Declension::Genitive.index()],
                             ),
-                            3..=9 => word.push_str(UNITS[units - 3][Declination::Genitive.index()]),
+                            3..=9 => word.push_str(UNITS[units - 3][Declension::Genitive.index()]),
                             _ => (),
                         }
                     }
@@ -880,7 +879,7 @@ impl Language for Ukrainian {
                 } else {
                     if hundreds > 0 {
                         words.push(String::from(
-                            HUNDREDS[hundreds - 1][Declination::Nominative.index()],
+                            HUNDREDS[hundreds - 1][Declension::Nominative.index()],
                         ));
                     }
                     if tens == 1 {
@@ -889,9 +888,8 @@ impl Language for Ukrainian {
                         words.push(format!("{}{flexion}", ORDINAL_TENS_BASES[tens - 1]));
                     } else {
                         if tens > 1 {
-                            words.push(String::from(
-                                TENS[tens - 2][Declination::Nominative.index()],
-                            ));
+                            words
+                                .push(String::from(TENS[tens - 2][Declension::Nominative.index()]));
                         }
                         let flexion = self.ordinal_flexion(BigFloat::from(units as u8));
                         words.push(format!("{}{flexion}", ORDINAL_UNIT_BASES[units - 1]));
@@ -902,7 +900,7 @@ impl Language for Ukrainian {
 
             if hundreds > 0 {
                 words.push(String::from(
-                    HUNDREDS[hundreds - 1][Declination::Nominative.index()],
+                    HUNDREDS[hundreds - 1][Declension::Nominative.index()],
                 ));
             }
 
@@ -916,31 +914,29 @@ impl Language for Ukrainian {
                 words.push(format!(
                     "{}{}",
                     TEENS_BASES[units],
-                    TEENS_FLEXIONS[Declination::Nominative.index()]
+                    TEENS_FLEXIONS[Declension::Nominative.index()]
                 ));
             } else {
                 if tens > 1 {
-                    words.push(String::from(
-                        TENS[tens - 2][Declination::Nominative.index()],
-                    ));
+                    words.push(String::from(TENS[tens - 2][Declension::Nominative.index()]));
                 }
                 if units == 1 || units == 2 {
                     words.push(String::from(
                         GENDERED[units - 1][properties.gender.index()]
-                            [Declination::Nominative.index()],
+                            [Declension::Nominative.index()],
                     ));
                 } else if units > 0 {
                     words.push(String::from(
-                        UNITS[units - 3][Declination::Nominative.index()],
+                        UNITS[units - 3][Declension::Nominative.index()],
                     ));
                 }
             }
 
             if order != 0 && triplet != &0 {
                 let mega_flexion = if order == 1 {
-                    THOUSAND_FLEXIONS[properties.number.index()][properties.declination.index()]
+                    THOUSAND_FLEXIONS[properties.number.index()][properties.declension.index()]
                 } else {
-                    MEGA_FLEXIONS[properties.number.index()][properties.declination.index()]
+                    MEGA_FLEXIONS[properties.number.index()][properties.declension.index()]
                 };
                 words.push(format!("{}{}", MEGA_BASES[order - 1], mega_flexion));
             }
@@ -966,13 +962,13 @@ impl Language for Ukrainian {
             format!(
                 "{} {}",
                 year_lang.to_ordinal(num)?,
-                YEAR[self.number.index()][self.declination.index()]
+                YEAR[self.number.index()][self.declension.index()]
             )
         } else {
             format!(
                 "{} {} до н.е.",
                 year_lang.to_ordinal(-num)?,
-                YEAR[self.number.index()][self.declination.index()]
+                YEAR[self.number.index()][self.declension.index()]
             )
         })
     }
@@ -1152,18 +1148,18 @@ mod tests {
     }
 
     #[test]
-    fn test_declination_agreement() {
+    fn test_declension_agreement() {
         assert_eq!(
             Ukrainian {
                 gender: Gender::Masculine,
                 number: GrammaticalNumber::Singular,
-                declination: Declination::Nominative
+                declension: Declension::Nominative
             }
             .agreement_with_units(0, 0),
             Ukrainian {
                 gender: Gender::Masculine,
                 number: GrammaticalNumber::Plural,
-                declination: Declination::Genitive
+                declension: Declension::Genitive
             },
             "failed agreement: 0"
         );
@@ -1171,13 +1167,13 @@ mod tests {
             Ukrainian {
                 gender: Gender::Masculine,
                 number: GrammaticalNumber::Singular,
-                declination: Declination::Nominative
+                declension: Declension::Nominative
             }
             .agreement_with_units(0, 1),
             Ukrainian {
                 gender: Gender::Masculine,
                 number: GrammaticalNumber::Singular,
-                declination: Declination::Nominative
+                declension: Declension::Nominative
             },
             "failed agreement: 1"
         );
@@ -1185,13 +1181,13 @@ mod tests {
             Ukrainian {
                 gender: Gender::Feminine,
                 number: GrammaticalNumber::Singular,
-                declination: Declination::Nominative
+                declension: Declension::Nominative
             }
             .agreement_with_units(8, 2),
             Ukrainian {
                 gender: Gender::Feminine,
                 number: GrammaticalNumber::Plural,
-                declination: Declination::Nominative
+                declension: Declension::Nominative
             },
             "failed agreement: 82"
         );
@@ -1199,13 +1195,13 @@ mod tests {
             Ukrainian {
                 gender: Gender::Masculine,
                 number: GrammaticalNumber::Singular,
-                declination: Declination::Dative
+                declension: Declension::Dative
             }
             .agreement_with_units(1, 1),
             Ukrainian {
                 gender: Gender::Masculine,
                 number: GrammaticalNumber::Plural,
-                declination: Declination::Dative
+                declension: Declension::Dative
             },
             "failed agreement: 11"
         );
@@ -1213,13 +1209,13 @@ mod tests {
             Ukrainian {
                 gender: Gender::Feminine,
                 number: GrammaticalNumber::Singular,
-                declination: Declination::Instrumental
+                declension: Declension::Instrumental
             }
             .agreement_with_units(5, 4),
             Ukrainian {
                 gender: Gender::Feminine,
                 number: GrammaticalNumber::Plural,
-                declination: Declination::Instrumental
+                declension: Declension::Instrumental
             },
             "failed agreement: 54"
         );
@@ -1227,13 +1223,13 @@ mod tests {
             Ukrainian {
                 gender: Gender::Masculine,
                 number: GrammaticalNumber::Singular,
-                declination: Declination::Nominative
+                declension: Declension::Nominative
             }
             .agreement_with_units(1, 8),
             Ukrainian {
                 gender: Gender::Masculine,
                 number: GrammaticalNumber::Plural,
-                declination: Declination::Genitive
+                declension: Declension::Genitive
             },
             "failed agreement: 18"
         );
@@ -1241,13 +1237,13 @@ mod tests {
             Ukrainian {
                 gender: Gender::Feminine,
                 number: GrammaticalNumber::Singular,
-                declination: Declination::Nominative
+                declension: Declension::Nominative
             }
             .agreement_with_units(0, 1),
             Ukrainian {
                 gender: Gender::Feminine,
                 number: GrammaticalNumber::Singular,
-                declination: Declination::Nominative
+                declension: Declension::Nominative
             },
             "failed agreement: 1 feminine"
         );
@@ -1421,7 +1417,7 @@ mod tests {
             Ukrainian::new(
                 Gender::Neuter,
                 GrammaticalNumber::Singular,
-                Declination::Accusative
+                Declension::Accusative
             )
             .float_to_cardinal(BigFloat::from(973.0)),
             Ok(String::from("девʼятсот сімдесят три"))

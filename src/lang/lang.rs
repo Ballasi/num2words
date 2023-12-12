@@ -60,7 +60,7 @@ pub fn to_language(lang: Lang, preferences: Vec<String>) -> Box<dyn Language> {
             Box::new(lang::English::new(false, false))
         }
         Lang::Ukrainian => {
-            let declination: lang::uk::Declination = preferences
+            let declension: lang::uk::Declension = preferences
                 .iter()
                 .rev()
                 .find_map(|d| d.parse().ok())
@@ -75,7 +75,7 @@ pub fn to_language(lang: Lang, preferences: Vec<String>) -> Box<dyn Language> {
                 .rev()
                 .find_map(|d| d.parse().ok())
                 .unwrap_or_default();
-            Box::new(lang::Ukrainian::new(gender, number, declination))
+            Box::new(lang::Ukrainian::new(gender, number, declension))
         }
     }
 }
