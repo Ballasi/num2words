@@ -358,25 +358,25 @@ const ORDINAL_SOFT_FLEXIONS_SINGULAR_SHORT: [[&str; 6]; 3] = [
 const ORDINAL_FLEXIONS_PLURAL_SHORT: [&str; 6] = ["і", "х", "м", "х", "ми", "х"];
 
 #[rustfmt::skip]
-const NOUN_2ST_GROUP_HARD_DECLENSIONS: [[&str; 6]; 2] = [ //долар
+const NOUN_2ST_GROUP_HARD_DECLINATIONS: [[&str; 6]; 2] = [ //долар
     [ "",  "а",  "у",  "а", "ом",  "і"  ],
     [ "и", "ів", "ам", "и", "ами", "ах" ],
 ];
 
 #[rustfmt::skip]
-const NOUN_2ST_GROUP_SOFT_DECLENSIONS: [[&str; 6]; 2] = [ //юань
+const NOUN_2ST_GROUP_SOFT_DECLINATIONS: [[&str; 6]; 2] = [ //юань
     [ "ь",  "я",  "ю", "я", "єм",  "і"  ],
     [ "і", "ів", "ям", "і", "ями", "ях" ],
 ];
 
 #[rustfmt::skip]
-const NOUN_1ST_GROUP_SOFT_DECLENSIONS_VOWEL: [[&str; 6]; 2] = [ //рупія
+const NOUN_1ST_GROUP_SOFT_DECLINATIONS_VOWEL: [[&str; 6]; 2] = [ //рупія
     [ "я", "ї", "ї",  "я", "єю",  "ї"  ],
     [ "ї", "й", "ям", "ї", "ями", "ях" ],
 ];
 
 #[rustfmt::skip]
-const NOUN_1ST_GROUP_HARD_DECLENSIONS: [[&str; 6]; 2] = [ //єна
+const NOUN_1ST_GROUP_HARD_DECLINATIONS: [[&str; 6]; 2] = [ //єна
     [ "а", "и", "і",  "а", "ою",  "і"  ],
     [ "и", "",  "ам", "и", "ами", "ах" ],
 ];
@@ -414,7 +414,7 @@ impl Ukrainian {
         match currency {
             Currency::AED => format!(
                 "дирхам{}",
-                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
             ),
             Currency::ARS
             | Currency::CLP
@@ -432,36 +432,36 @@ impl Ukrainian {
             | Currency::TWD
             | Currency::USD => format!(
                 "долар{}",
-                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
             ),
             Currency::BRL => format!(
                 "реал{}",
-                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
             ),
             Currency::CHF => format!(
                 "франк{}",
-                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
             ),
             Currency::CNY => format!(
                 "юан{}",
-                NOUN_2ST_GROUP_SOFT_DECLENSIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_SOFT_DECLINATIONS[number_idx][declination_idx]
             ),
             Currency::CRC => format!(
                 "колон{}",
-                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
             ),
             Currency::DINAR | Currency::DZD | Currency::KWD => format!(
                 "динар{}",
-                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
             ),
             Currency::EUR => String::from("євро"),
             Currency::GBP => format!(
                 "фунт{}",
-                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
             ),
             Currency::IDR | Currency::INR => format!(
                 "рупі{}",
-                NOUN_1ST_GROUP_SOFT_DECLENSIONS_VOWEL[number_idx][declination_idx]
+                NOUN_1ST_GROUP_SOFT_DECLINATIONS_VOWEL[number_idx][declination_idx]
             ),
             Currency::ILS => {
                 let adjective_flextion = if self.number == GrammaticalNumber::Plural {
@@ -472,29 +472,29 @@ impl Ukrainian {
                 format!(
                     "нов{} шекел{}",
                     adjective_flextion,
-                    NOUN_2ST_GROUP_SOFT_DECLENSIONS[number_idx][declination_idx]
+                    NOUN_2ST_GROUP_SOFT_DECLINATIONS[number_idx][declination_idx]
                 )
             }
             Currency::JPY => format!(
                 "єн{}",
-                NOUN_1ST_GROUP_HARD_DECLENSIONS[number_idx][declination_idx]
+                NOUN_1ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
             ),
             Currency::KRW => format!(
                 "вон{}",
-                NOUN_1ST_GROUP_HARD_DECLENSIONS[number_idx][declination_idx]
+                NOUN_1ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
             ),
             Currency::KZT => String::from("tenge"),
             Currency::MYR => format!(
                 "рингіт{}",
-                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
             ),
             Currency::NOK => format!(
                 "крон{}",
-                NOUN_1ST_GROUP_HARD_DECLENSIONS[number_idx][declination_idx]
+                NOUN_1ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
             ),
             Currency::PEN => format!(
                 "сол{}",
-                NOUN_2ST_GROUP_SOFT_DECLENSIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_SOFT_DECLINATIONS[number_idx][declination_idx]
             ),
             Currency::PLN => {
                 let flextion = if self.number == GrammaticalNumber::Plural {
@@ -506,29 +506,29 @@ impl Ukrainian {
             }
             Currency::QAR | Currency::RIYAL | Currency::SAR => format!(
                 "ріал{}",
-                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
             ),
             Currency::RUB =>
-            //format!("рубл{}", NOUN_1ST_GROUP_MASCULINE_SOFT_DECLENSIONS[number_idx][declination_idx]),
+            //format!("рубл{}", NOUN_1ST_GROUP_MASCULINE_SOFT_DECLINATIONS[number_idx][declination_idx]),
             {
                 String::from("руській воєнний корабль іді нахуй")
             }
             Currency::THB => format!(
                 "бат{}",
-                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
             ),
             Currency::TRY => format!(
                 "куруш{}",
-                NOUN_1ST_GROUP_HARD_DECLENSIONS[number_idx][declination_idx]
+                NOUN_1ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
             ),
             Currency::UAH => String::from(HRYVNIAS[number_idx][declination_idx]),
             Currency::VND => format!(
                 "донг{}",
-                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
             ),
             Currency::ZAR => format!(
                 "ранд{}",
-                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
             ),
             //_ => currency.default_string(self.number == GrammaticalNumber::Plural),
         }
@@ -552,7 +552,7 @@ impl Ukrainian {
         match currency {
             Currency::AED => format!(
                 "філс{}",
-                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
             ),
             Currency::ARS
             | Currency::CLP
@@ -571,85 +571,85 @@ impl Ukrainian {
             | Currency::TWD
             | Currency::USD => format!(
                 "цент{}",
-                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
             ),
             Currency::CHF => format!(
                 "сантим{}",
-                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
             ),
             Currency::CNY => format!(
                 "фен{}",
-                NOUN_2ST_GROUP_SOFT_DECLENSIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_SOFT_DECLINATIONS[number_idx][declination_idx]
             ),
             Currency::CRC => String::from("сантимо"),
             Currency::DINAR | Currency::DZD | Currency::KWD => format!(
                 "філс{}",
-                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
             ),
             Currency::EUR => format!(
                 "євроцент{}",
-                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
             ),
             Currency::GBP => format!(
                 "пенс{}",
-                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
             ),
             Currency::IDR => format!(
                 "сен{}",
-                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
             ),
             Currency::INR => format!(
                 "пайс{}",
-                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
             ),
             Currency::ILS => format!(
                 "агор{}",
-                NOUN_1ST_GROUP_HARD_DECLENSIONS[number_idx][declination_idx]
+                NOUN_1ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
             ),
             Currency::JPY => format!(
                 "сен{}",
-                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
             ),
             Currency::KRW => format!(
                 "чон{}",
-                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
             ),
             Currency::KZT => format!(
                 "тиїн{}",
-                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
             ),
             Currency::MYR => format!(
                 "сен{}",
-                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
             ),
             Currency::NOK => String::from("оре"),
             Currency::PEN => String::from("сентімо"),
             Currency::PLN => format!(
                 "грош{}",
-                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
             ),
             Currency::QAR | Currency::RIYAL | Currency::SAR => format!(
                 "філс{}",
-                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
             ),
             Currency::RUB =>
-            //format!("копійк{}", NOUN_1ST_GROUP_FEMININE_HARD_DECLENSIONS[number_idx][declination_idx]),
+            //format!("копійк{}", NOUN_1ST_GROUP_FEMININE_HARD_DECLINATIONS[number_idx][declination_idx]),
             {
                 String::from("руській воєнний корабль іді нахуй")
             }
             Currency::THB => format!(
                 "cатанг{}",
-                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
             ),
             Currency::TRY => format!(
                 "лір{}",
-                NOUN_1ST_GROUP_HARD_DECLENSIONS[number_idx][declination_idx]
+                NOUN_1ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
             ),
             Currency::UAH => String::from(KOPIYKAS[number_idx][declination_idx]),
             Currency::VND => String::from("су"),
             Currency::ZAR => format!(
                 "цент{}",
-                NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declination_idx]
+                NOUN_2ST_GROUP_HARD_DECLINATIONS[number_idx][declination_idx]
             ),
             //_ => currency.default_cent_string(self.number == GrammaticalNumber::Plural)
         }
