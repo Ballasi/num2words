@@ -23,6 +23,13 @@ pub enum Lang {
     /// );
     /// ```
     English,
+    /// ```
+    /// use num2words::{Num2Words, Lang};
+    /// assert_eq!(
+    ///     Num2Words::new(42).lang(Lang::Ukrainian).to_words(),
+    ///     Ok(String::from("сорок два"))
+    /// );
+    /// ```
     Ukrainian,
 }
 
