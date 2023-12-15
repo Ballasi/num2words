@@ -254,12 +254,27 @@ impl Num2Words {
 
     /// Adds a preference parameter
     ///
+    /// # English language accepts:
+    /// oh and/or nil as replacements for "zero"
+    ///
+    /// # Ukrainian language supports grammatical categories (bold - default):
+    /// Number: **singular/sing/однина/од**, plural/pl/множина/мн
+    ///
+    /// Gender: **masculine/m/чоловічий/чол/ч**, feminine/f/жіночий/жін/ж, neuter/n/середній/сер/с
+    ///
+    /// Declension: **nominative/nom/називний/н**, genitive/gen/родовий/р, dative/dat/давальний/д,
+    /// accusative/acc/знахідний/з, instrumental/inc/орудний/о, locative/loc/місцевий/м
+    ///
     /// Example:
     /// ```
-    /// use num2words::{Num2Words, Currency};
+    /// use num2words::{Num2Words, Lang};
     /// assert_eq!(
     ///     Num2Words::new(0.05).prefer("oh").to_words(),
     ///     Ok(String::from("point oh five"))
+    /// );
+    /// assert_eq!(
+    ///     Num2Words::new(51).lang(Lang::Ukrainian).prefer("орудний").to_words(),
+    ///     Ok(String::from("пʼятдесятьма одним"))
     /// );
     /// ```
     pub fn prefer<T>(mut self, prefer: T) -> Self

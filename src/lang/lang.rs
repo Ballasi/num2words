@@ -23,6 +23,7 @@ pub enum Lang {
     /// );
     /// ```
     English,
+    Ukrainian,
 }
 
 impl FromStr for Lang {
@@ -31,12 +32,14 @@ impl FromStr for Lang {
     /// Parses a string to return a value of this type
     ///
     ///
-    /// | ISO 639-1 | Lang            | 42        |
-    /// | --------- | --------------- | --------- |
-    /// | `en`      | `Lang::English` | forty-two |
+    /// | ISO 639-1 | Lang              | 42        |
+    /// | --------- | ----------------- | --------- |
+    /// | `en`      | `Lang::English`   | forty-two |
+    /// | `uk`      | `Lang::Ukrainian` | сорок два |
     fn from_str(input: &str) -> Result<Self, Self::Err> {
         match input {
             "en" => Ok(Self::English),
+            "uk" => Ok(Self::Ukrainian),
             _ => Err(()),
         }
     }
@@ -55,6 +58,24 @@ pub fn to_language(lang: Lang, preferences: Vec<String>) -> Box<dyn Language> {
             }
 
             Box::new(lang::English::new(false, false))
+        }
+        Lang::Ukrainian => {
+            let declension: lang::uk::Declension = preferences
+                .iter()
+                .rev()
+                .find_map(|d| d.parse().ok())
+                .unwrap_or_default();
+            let gender: lang::uk::Gender = preferences
+                .iter()
+                .rev()
+                .find_map(|d| d.parse().ok())
+                .unwrap_or_default();
+            let number: lang::uk::GrammaticalNumber = preferences
+                .iter()
+                .rev()
+                .find_map(|d| d.parse().ok())
+                .unwrap_or_default();
+            Box::new(lang::Ukrainian::new(gender, number, declension))
         }
     }
 }

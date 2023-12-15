@@ -74,9 +74,10 @@
  *
  * Here is a list of all of the supported languages:
  *
- * | Flag | Code            | ISO 639-1 | Language | 42        |
- * | ---- | --------------- | --------- | -------- | --------- |
- * | 🇺🇸🇬🇧 | `Lang::English` | `en`      | English  | forty-two |
+ * | Flag | Code              | ISO 639-1 | Language   | 42        |
+ * | ---- | ----------------- | --------- | ---------- | --------- |
+ * | 🇺🇸🇬🇧 | `Lang::English`   | `en`      | English    | forty-two |
+ * | 🇺🇦   | `Lang::Ukrainian` | `uk`      | Ukrainian  | сорок два |
  *
  * This list can be expanded! Contributions are welcomed.
  *
