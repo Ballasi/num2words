@@ -1,6 +1,6 @@
 [package]
 name = "num2words"
-version = "1.0.1"
+version = "1.1.0"
 authors = ["Asperatus <rust@ballasi.com>"]
 edition = "2018"
 description = "Convert numbers like 42 to forty-two"
