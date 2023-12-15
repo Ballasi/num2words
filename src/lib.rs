@@ -77,7 +77,7 @@
  * | Flag | Code              | ISO 639-1 | Language   | 42        |
  * | ---- | ----------------- | --------- | ---------- | --------- |
  * | 🇺🇸🇬🇧 | `Lang::English`   | `en`      | English    | forty-two |
- * | 🇺🇦   | `Lang::Ukrainian` | `ua`      | Ukrainian  | сорок два |
+ * | 🇺🇦   | `Lang::Ukrainian` | `uk`      | Ukrainian  | сорок два |
  *
  * This list can be expanded! Contributions are welcomed.
  *
