@@ -21,4 +21,4 @@ name = "num2words"
 path = "src/bin/bin.rs"
 
 [dependencies]
-num-bigfloat = { version = "1.6.2", default-features = false }
+num-bigfloat = { version = "^1.7.1", default-features = false }
