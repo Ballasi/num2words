@@ -256,6 +256,11 @@ impl Num2Words {
     ///
     /// # English language accepts:
     /// oh and/or nil as replacements for "zero"
+    /// 
+    /// # French language accepts:
+    /// feminine/f/féminin/feminin
+    /// 
+    /// reformed/1990/rectifié/rectification
     ///
     /// # Ukrainian language supports grammatical categories (bold - default):
     /// Number: **singular/sing/однина/од**, plural/pl/множина/мн
@@ -265,12 +270,16 @@ impl Num2Words {
     /// Declension: **nominative/nom/називний/н**, genitive/gen/родовий/р, dative/dat/давальний/д,
     /// accusative/acc/знахідний/з, instrumental/inc/орудний/о, locative/loc/місцевий/м
     ///
-    /// Example:
+    /// Examples:
     /// ```
     /// use num2words::{Num2Words, Lang};
     /// assert_eq!(
     ///     Num2Words::new(0.05).prefer("oh").to_words(),
     ///     Ok(String::from("point oh five"))
+    /// );
+    /// assert_eq!(
+    ///     Num2Words::new(161).lang(Lang::French).prefer("f").prefer("reformed").to_words(),
+    ///     Ok(String::from("cent-soixante-et-une"))
     /// );
     /// assert_eq!(
     ///     Num2Words::new(51).lang(Lang::Ukrainian).prefer("орудний").to_words(),

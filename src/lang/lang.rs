@@ -26,6 +26,14 @@ pub enum Lang {
     /// ```
     /// use num2words::{Num2Words, Lang};
     /// assert_eq!(
+    ///     Num2Words::new(42).lang(Lang::French).to_words(),
+    ///     Ok(String::from("quarante-deux"))
+    /// );
+    /// ```
+    French,
+    /// ```
+    /// use num2words::{Num2Words, Lang};
+    /// assert_eq!(
     ///     Num2Words::new(42).lang(Lang::Ukrainian).to_words(),
     ///     Ok(String::from("сорок два"))
     /// );
@@ -39,13 +47,15 @@ impl FromStr for Lang {
     /// Parses a string to return a value of this type
     ///
     ///
-    /// | ISO 639-1 | Lang              | 42        |
-    /// | --------- | ----------------- | --------- |
-    /// | `en`      | `Lang::English`   | forty-two |
-    /// | `uk`      | `Lang::Ukrainian` | сорок два |
+    /// | ISO 639-1 | Lang              | 42            |
+    /// | --------- | ----------------- | ------------- |
+    /// | `en`      | `Lang::English`   | forty-two     |
+    /// | `fr`      | `Lang::French`    | quarante-deux |
+    /// | `uk`      | `Lang::Ukrainian` | сорок два     |
     fn from_str(input: &str) -> Result<Self, Self::Err> {
         match input {
             "en" => Ok(Self::English),
+            "fr" => Ok(Self::French),
             "uk" => Ok(Self::Ukrainian),
             _ => Err(()),
         }
@@ -65,6 +75,18 @@ pub fn to_language(lang: Lang, preferences: Vec<String>) -> Box<dyn Language> {
             }
 
             Box::new(lang::English::new(false, false))
+        }
+        Lang::French => {
+            let feminine = preferences
+                .iter()
+                .find(|v| ["feminine", "feminin", "féminin", "f"].contains(&v.as_str()))
+                .is_some();
+            let reformed = preferences
+                .iter()
+                .find(|v: &&String| ["reformed", "1990", "rectifié", "rectification"].contains(&v.as_str()))
+                .is_some();
+
+            Box::new(lang::French::new(feminine, reformed))
         }
         Lang::Ukrainian => {
             let declension: lang::uk::Declension = preferences

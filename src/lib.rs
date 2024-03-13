@@ -23,8 +23,8 @@
  * ```rust
  * use num2words::*;
  * assert_eq!(
- *     Num2Words::new(42).lang(Lang::English).to_words(),
- *     Ok(String::from("forty-two"))
+ *     Num2Words::new(42).lang(Lang::French).to_words(),
+ *     Ok(String::from("quarante-deux"))
  * );
  * assert_eq!(
  *     Num2Words::new(42).ordinal().to_words(),
@@ -49,8 +49,8 @@
  * ```sh
  * $ num2words 42
  * forty-two
- * $ num2words 10 --to EUR
- * ten euros
+ * $ num2words 10 --to UAH --lang uk
+ * десять гривень
  * ```
  *
  * You can download the app via the following command:
@@ -74,10 +74,11 @@
  *
  * Here is a list of all of the supported languages:
  *
- * | Flag | Code              | ISO 639-1 | Language   | 42        |
- * | ---- | ----------------- | --------- | ---------- | --------- |
- * | 🇺🇸🇬🇧 | `Lang::English`   | `en`      | English    | forty-two |
- * | 🇺🇦   | `Lang::Ukrainian` | `uk`      | Ukrainian  | сорок два |
+ * | Flag | Code              | ISO 639-1 | Language   | 42            |
+ * | ---- | ----------------- | --------- | ---------- | ------------- |
+ * | 🇺🇸🇬🇧 | `Lang::English`   | `en`      | English    | forty-two     |
+ * | 🇫🇷   | `Lang::French`    | `fr`      | French     | quarante-deux |
+ * | 🇺🇦   | `Lang::Ukrainian` | `uk`      | Ukrainian  | сорок два     |
  *
  * This list can be expanded! Contributions are welcomed.
  *
