@@ -5,100 +5,95 @@ use std::str::FromStr;
 /// Every three-letter variant is a valid ISO 4217 currency code. The only
 /// exceptions are `DINAR`, `DOLLAR`, `PESO` and `RIYAL`, which are generic
 /// terminology for the respective currencies.
-///
-/// Here is a summary of all of the available currencies:
-///
-/// | Enum variant       | CLI argument  | Currency name in English |
-/// | ------------------ | ------------- | ------------------------ |
-/// | `Currency::AED`    | `AED`         | Dirham                   |
-/// | `Currency::ARS`    | `ARS`         | Argentine peso           |
-/// | `Currency::AUD`    | `AUD`         | Australian dollar        |
-/// | `Currency::BRL`    | `BRL`         | Brazilian real           |
-/// | `Currency::CAD`    | `CAD`         | Canadian dollar          |
-/// | `Currency::CHF`    | `CHF`         | Swiss franc              |
-/// | `Currency::CLP`    | `CLP`         | Chilean peso             |
-/// | `Currency::CNY`    | `CNY`         | Chinese yuan             |
-/// | `Currency::COP`    | `COP`         | Colombian peso           |
-/// | `Currency::CRC`    | `CRC`         | Costa Rican colón        |
-/// | `Currency::DINAR`  | `DINAR`       | Dinar                    |
-/// | `Currency::DOLLAR` | `DOLLAR`      | Dollar                   |
-/// | `Currency::DZD`    | `DZD`         | Algerian dinar           |
-/// | `Currency::EUR`    | `EUR`         | Euro                     |
-/// | `Currency::GBP`    | `GBP`         | British pound            |
-/// | `Currency::HKD`    | `HKD`         | Hong Kong dollar         |
-/// | `Currency::IDR`    | `IDR`         | Indonesian rupiah        |
-/// | `Currency::ILS`    | `ILS`         | Israeli new shekel       |
-/// | `Currency::INR`    | `INR`         | Indian rupee             |
-/// | `Currency::JPY`    | `JPY`         | Japanese yen             |
-/// | `Currency::KRW`    | `KRW`         | South Korean won         |
-/// | `Currency::KWD`    | `KWD`         | Kuwaiti dinar            |
-/// | `Currency::KZT`    | `KZT`         | Kazakhstani tenge        |
-/// | `Currency::MXN`    | `MXN`         | Mexican peso             |
-/// | `Currency::MYR`    | `MYR`         | Malaysian ringgit        |
-/// | `Currency::NOK`    | `NOK`         | Norwegian krone          |
-/// | `Currency::NZD`    | `NZD`         | New Zealand dollar       |
-/// | `Currency::PEN`    | `PEN`         | Peruvian sol             |
-/// | `Currency::PESO`   | `PESO`        | Peso                     |
-/// | `Currency::PHP`    | `PHP`         | Philippine peso          |
-/// | `Currency::PLN`    | `PLN`         | Polish zloty             |
-/// | `Currency::QAR`    | `QAR`         | Qatari riyal             |
-/// | `Currency::RIYAL`  | `RIYAL`       | Riyal                    |
-/// | `Currency::RUB`    | `RUB`         | Russian ruble            |
-/// | `Currency::SAR`    | `SAR`         | Saudi riyal              |
-/// | `Currency::SGD`    | `SGD`         | Singapore dollar         |
-/// | `Currency::THB`    | `THB`         | Thai baht                |
-/// | `Currency::TRY`    | `TRY`         | Turkish lira             |
-/// | `Currency::TWD`    | `TWD`         | Taiwan dollar            |
-/// | `Currency::UAH`    | `UAH`         | Ukrainian hryvnia        |
-/// | `Currency::USD`    | `USD`         | US dollar                |
-/// | `Currency::UYU`    | `UYU`         | Uruguayan peso           |
-/// | `Currency::VND`    | `VND`         | Vietnamese dong          |
-/// | `Currency::ZAR`    | `ZAR`         | South African rand       |
 #[derive(Clone, Copy)]
 pub enum Currency {
+    /// Dirham
     AED,
+    /// Argentine peso
     ARS,
+    /// Australian dollar
     AUD,
+    /// Brazilian real
     BRL,
+    /// Canadian dollar
     CAD,
+    /// Swiss franc
     CHF,
+    /// Chilean peso
     CLP,
+    /// Chinese yuan
     CNY,
+    /// Colombian peso
     COP,
+    /// Costa Rican colón
     CRC,
+    /// Dinar
     DINAR,
+    /// Dollar
     DOLLAR,
+    /// Algerian dinar
     DZD,
+    /// Euro
     EUR,
+    /// British pound
     GBP,
+    /// Hong Kong dollar
     HKD,
+    /// Indonesian rupiah
     IDR,
+    /// Israeli new shekel
     ILS,
+    /// Indian rupee
     INR,
+    /// Japanese yen
     JPY,
+    /// South Korean won
     KRW,
+    /// Kuwaiti dinar
     KWD,
+    /// Kazakhstani tenge
     KZT,
+    /// Mexican peso
     MXN,
+    /// Malaysian ringgit
     MYR,
+    /// Norwegian krone
     NOK,
+    /// New Zealand dollar
     NZD,
+    /// Peruvian sol
     PEN,
+    /// Peso
     PESO,
+    /// Philippine peso
     PHP,
+    /// Polish zloty
     PLN,
+    /// Qatari riyal
     QAR,
+    /// Riyal
     RIYAL,
+    /// Russian ruble
     RUB,
+    /// Saudi riyal
     SAR,
+    /// Singapore dollar
     SGD,
+    /// Thai baht
     THB,
+    /// Turkish lira
     TRY,
+    /// Taiwan dollar
     TWD,
+    /// Ukrainian hryvnia
     UAH,
+    /// US dollar
     USD,
+    /// Uruguayan peso
     UYU,
+    /// Vietnamese dong
     VND,
+    /// South African rand
     ZAR,
 }
 
