@@ -67,7 +67,7 @@ impl English {
     }
 
     fn cents(&self, currency: Currency, plural_form: bool) -> String {
-        currency.default_cent_string(plural_form)
+        currency.default_subunit_string("cent{}", plural_form)
     }
 
     fn split_thousands(&self, mut num: BigFloat) -> Vec<u64> {

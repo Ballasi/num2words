@@ -176,8 +176,25 @@ impl Currency {
     }
 
     /// Returns a default string representation for the cents of the currency
-    pub fn default_cent_string(&self, plural_form: bool) -> String {
-        String::from(if plural_form { "cents" } else { "cent" })
+    pub fn default_subunit_string(&self, cent: &str, plural_form: bool) -> String {
+        String::from(
+            match self {
+                Currency::AED | Currency::KWD => "fils",
+                Currency::ARS | Currency::BRL | Currency::CLP | Currency::COP | Currency::MXN => {
+                    "centavo{}"
+                }
+                Currency::CRC => "céntimo{}",
+                Currency::IDR | Currency::MYR => "sen{}",
+                Currency::KRW => "jeon{}",
+                Currency::SAR => "halalat{}",
+                Currency::THB => "satang{}",
+                Currency::UAH => "kopiyok{}",
+                Currency::UYU => "centesimo{}",
+                Currency::VND => "xu{}",
+                _ => cent,
+            }
+            .replace("{}", if plural_form { "s" } else { "" }),
+        )
     }
 }
 
