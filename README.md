@@ -60,8 +60,8 @@ You can download the app via the following command:
 $ cargo install num2words
 ```
 
-You can also change the language via the CLI argument `--lang [ISO 639-1
-code]` and provide a specific output type or a currency with the argument
+You can also change the language via the CLI argument `--lang [locale]` and
+provide a specific output type or a currency with the argument
 `--to [cardinal|ordinal|ordinal_num|year|ISO 4217]`.
 
 For more information about the usage of `num2words` please refer to the docs
@@ -77,11 +77,13 @@ $ num2words --help
 
 Here is a list of all of the supported languages:
 
-| Flag | Code              | ISO 639-1 | Language   | 42            |
-| ---- | ----------------- | --------- | ---------- | ------------- |
-| 🇺🇸🇬🇧 | `Lang::English`   | `en`      | English    | forty-two     |
-| 🇫🇷   | `Lang::French`    | `fr`      | French     | quarante-deux |
-| 🇺🇦   | `Lang::Ukrainian` | `uk`      | Ukrainian  | сорок два     |
+| Flag | Code              | Locale    | Language    | 42            |
+| ---- | ----------------- | --------- | ----------- | ------------- |
+| 🇺🇸🇬🇧 | `Lang::English`   | `en`      | English     | forty-two     |
+| 🇫🇷🇨🇦 | `Lang::French`    | `fr`      | French      | quarante-deux |
+| 🇧🇪🇨🇩 | `Lang::French_BE` | `fr_BE`   | French (BE) | quarante-deux |
+| 🇨🇭   | `Lang::French_CH` | `fr_CH`   | French (CH) | quarante-deux |
+| 🇺🇦   | `Lang::Ukrainian` | `uk`      | Ukrainian   | сорок два     |
 
 This list can be expanded! Contributions are welcomed.
 

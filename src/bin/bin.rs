@@ -21,8 +21,11 @@ GLOBAL OPTIONS:
     -v, --version               print the version
 
 AVAILABLE LANGUAGES:
-    en: English
-    uk: Ukrainian
+    en:      English
+    fr:      French (France and Canada)
+    fr_BE:   French (Belgium and the Democratic Republic of the Congo)
+    fr_CH:   French (Swiss Confederation and Aosta Valley)
+    uk:      Ukrainian
 
 AVAILABLE OUTPUTS:
     cardinal:      forty-two (42)
@@ -32,7 +35,7 @@ AVAILABLE OUTPUTS:
     currency:      forty-two dollars and one cent (42.01)
 
 AVAILABLE CURRENCIES:
-    ISO 4217 code - USD, EUR, GBP, etc.
+    ISO 4217 code      - USD, EUR, GBP, etc.
     generic currencies - DINAR, DOLLAR, PESO, RIYAL"#;
 
 fn get_version() -> String {

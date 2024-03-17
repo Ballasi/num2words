@@ -14,6 +14,7 @@ pub trait Language {
 }
 
 /// Languages available in `num2words`
+#[allow(non_camel_case_types)]
 pub enum Lang {
     /// ```
     /// use num2words::{Num2Words, Lang};
@@ -23,6 +24,7 @@ pub enum Lang {
     /// );
     /// ```
     English,
+    /// French from France and Canada
     /// ```
     /// use num2words::{Num2Words, Lang};
     /// assert_eq!(
@@ -31,6 +33,24 @@ pub enum Lang {
     /// );
     /// ```
     French,
+    /// French from Belgium and the Democratic Republic of the Congo
+    /// ```
+    /// use num2words::{Num2Words, Lang};
+    /// assert_eq!(
+    ///     Num2Words::new(70).lang(Lang::French_BE).to_words(),
+    ///     Ok(String::from("septante"))
+    /// );
+    /// ```
+    French_BE,
+    /// French from Swiss Confederation and Aosta Valley (Italy)
+    /// ```
+    /// use num2words::{Num2Words, Lang};
+    /// assert_eq!(
+    ///     Num2Words::new(80).lang(Lang::French_CH).to_words(),
+    ///     Ok(String::from("huitante"))
+    /// );
+    /// ```
+    French_CH,
     /// ```
     /// use num2words::{Num2Words, Lang};
     /// assert_eq!(
@@ -46,16 +66,19 @@ impl FromStr for Lang {
 
     /// Parses a string to return a value of this type
     ///
-    ///
-    /// | ISO 639-1 | Lang              | 42            |
+    /// | Locale    | Lang              | 42            |
     /// | --------- | ----------------- | ------------- |
     /// | `en`      | `Lang::English`   | forty-two     |
     /// | `fr`      | `Lang::French`    | quarante-deux |
+    /// | `fr_BE`   | `Lang::French_BE` | quarante-deux |
+    /// | `fr_CH`   | `Lang::French_CH` | quarante-deux |
     /// | `uk`      | `Lang::Ukrainian` | сорок два     |
     fn from_str(input: &str) -> Result<Self, Self::Err> {
         match input {
             "en" => Ok(Self::English),
             "fr" => Ok(Self::French),
+            "fr_BE" => Ok(Self::French_BE),
+            "fr_CH" => Ok(Self::French_CH),
             "uk" => Ok(Self::Ukrainian),
             _ => Err(()),
         }
@@ -86,7 +109,31 @@ pub fn to_language(lang: Lang, preferences: Vec<String>) -> Box<dyn Language> {
                 .find(|v: &&String| ["reformed", "1990", "rectifié", "rectification"].contains(&v.as_str()))
                 .is_some();
 
-            Box::new(lang::French::new(feminine, reformed))
+            Box::new(lang::French::new(feminine, reformed, lang::fr::RegionFrench::FR))
+        }
+        Lang::French_BE => {
+            let feminine = preferences
+                .iter()
+                .find(|v| ["feminine", "feminin", "féminin", "f"].contains(&v.as_str()))
+                .is_some();
+            let reformed = preferences
+                .iter()
+                .find(|v: &&String| ["reformed", "1990", "rectifié", "rectification"].contains(&v.as_str()))
+                .is_some();
+
+            Box::new(lang::French::new(feminine, reformed, lang::fr::RegionFrench::BE))
+        }
+        Lang::French_CH => {
+            let feminine = preferences
+                .iter()
+                .find(|v| ["feminine", "feminin", "féminin", "f"].contains(&v.as_str()))
+                .is_some();
+            let reformed = preferences
+                .iter()
+                .find(|v: &&String| ["reformed", "1990", "rectifié", "rectification"].contains(&v.as_str()))
+                .is_some();
+
+            Box::new(lang::French::new(feminine, reformed, lang::fr::RegionFrench::CH))
         }
         Lang::Ukrainian => {
             let declension: lang::uk::Declension = preferences

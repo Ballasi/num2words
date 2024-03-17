@@ -4,6 +4,15 @@ use num_bigfloat::BigFloat;
 pub struct French {
     feminine: bool,
     reformed: bool,
+    region: RegionFrench,
+}
+
+#[derive(Default, Clone, Copy, PartialEq, Debug)]
+pub enum RegionFrench {
+    #[default]
+    FR,
+    BE,
+    CH,
 }
 
 const UNITS: [&'static str; 9] = [
@@ -64,8 +73,21 @@ const MEGAS: [&'static str; 33] = [
 ];
 
 impl French {
-    pub fn new(feminine: bool, reformed: bool) -> Self {
-        Self { feminine, reformed }
+    pub fn new(feminine: bool, reformed: bool, region: RegionFrench) -> Self {
+        Self {
+            feminine,
+            reformed,
+            region,
+        }
+    }
+
+    fn get_tens(&self, tens: usize) -> &str {
+        match (tens, self.region) {
+            (7, RegionFrench::BE) | (7, RegionFrench::CH) => "septante",
+            (8, RegionFrench::CH) => "huitante",
+            (9, RegionFrench::BE) | (9, RegionFrench::CH) => "nonante",
+            _ => TENS[tens - 1],
+        }
     }
 
     fn currencies(&self, currency: Currency, plural_form: bool) -> String {
@@ -146,7 +168,13 @@ impl French {
                 if hundreds != 1 {
                     words.push(String::from(UNITS[hundreds - 1]));
                 }
-                words.push(String::from("cent"));
+                words.push(String::from(
+                    if i != 1 && tens == 0 && units == 0 && hundreds > 1 {
+                        "cents"
+                    } else {
+                        "cent"
+                    },
+                ));
             }
 
             if tens != 0 || units != 0 {
@@ -160,11 +188,17 @@ impl French {
                     "-"
                 };
                 match units {
-                    0 => words.push(String::from(TENS[tens - 1])),
-                    _ => match tens {
-                        0 => {
-                            if i == 0 || units > 1 || hundreds > 0 {
-                                // if i == 0, i.e., 1 => "un"
+                    0 => {
+                        if tens == 8 && i != 1 && self.region != RegionFrench::CH {
+                            words.push(String::from("quatre-vingts"))
+                        } else {
+                            words.push(String::from(self.get_tens(tens)))
+                        }
+                    }
+                    _ => match (tens, self.region) {
+                        (0, _) => {
+                            if i != 1 || units > 1 || hundreds > 0 {
+                                // if i != 0, i.e., "un", "un million" but "mille"
                                 // if units > 1, e.g. 2000 => "deux mille"
                                 // if hundreds > 0, e.g. 201000 => "deux cent un mille"
                                 words.push(String::from(
@@ -176,21 +210,28 @@ impl French {
                                 ));
                             }
                         }
-                        1 => words.push(String::from(TEENS[units])),
-                        7 => words.push(format!("{}{}{}", TENS[tens - 2], et_string, TEENS[units])),
-                        8 => words.push(format!(
+                        (1, _) => words.push(String::from(TEENS[units])),
+                        (7, RegionFrench::FR) => words.push(format!(
+                            "{}{}{}",
+                            self.get_tens(tens - 1),
+                            et_string,
+                            TEENS[units]
+                        )),
+                        (8, RegionFrench::FR) | (8, RegionFrench::BE) => words.push(format!(
                             "{}-{}",
-                            TENS[tens - 1],
+                            self.get_tens(tens),
                             if i == 0 && units == 1 && self.feminine {
                                 "une"
                             } else {
                                 UNITS[units - 1]
                             }
                         )),
-                        9 => words.push(format!("{}-{}", TENS[tens - 2], TEENS[units])),
+                        (9, RegionFrench::FR) => {
+                            words.push(format!("{}-{}", self.get_tens(tens - 1), TEENS[units]))
+                        }
                         _ => words.push(format!(
                             "{}{}{}",
-                            TENS[tens - 1],
+                            self.get_tens(tens),
                             et_string,
                             if i == 0 && units == 1 && self.feminine {
                                 "une"
@@ -355,6 +396,32 @@ mod tests {
             Ok(String::from("soixante et onze"))
         );
         assert_eq!(
+            Num2Words::new(80).lang(Lang::French).cardinal().to_words(),
+            Ok(String::from("quatre-vingts"))
+        );
+        assert_eq!(
+            Num2Words::new(200).lang(Lang::French).cardinal().to_words(),
+            Ok(String::from("deux cents"))
+        );
+        assert_eq!(
+            Num2Words::new(201).lang(Lang::French).cardinal().to_words(),
+            Ok(String::from("deux cent un"))
+        );
+        assert_eq!(
+            Num2Words::new(80000)
+                .lang(Lang::French)
+                .cardinal()
+                .to_words(),
+            Ok(String::from("quatre-vingt mille"))
+        );
+        assert_eq!(
+            Num2Words::new(80000000)
+                .lang(Lang::French)
+                .cardinal()
+                .to_words(),
+            Ok(String::from("quatre-vingts millions"))
+        );
+        assert_eq!(
             Num2Words::new(91).lang(Lang::French).cardinal().to_words(),
             Ok(String::from("quatre-vingt-onze"))
         );
@@ -419,6 +486,38 @@ mod tests {
                 .prefer("reformed")
                 .to_words(),
             Ok(String::from("cent-vingt-et-un-mille"))
+        );
+    }
+
+    #[test]
+    fn test_french_be() {
+        assert_eq!(
+            Num2Words::new(71).lang(Lang::French_BE).to_words(),
+            Ok(String::from("septante et un"))
+        );
+        assert_eq!(
+            Num2Words::new(81).lang(Lang::French_BE).to_words(),
+            Ok(String::from("quatre-vingt-un"))
+        );
+        assert_eq!(
+            Num2Words::new(92).lang(Lang::French_BE).to_words(),
+            Ok(String::from("nonante-deux"))
+        );
+    }
+
+    #[test]
+    fn test_french_ch() {
+        assert_eq!(
+            Num2Words::new(71).lang(Lang::French_CH).to_words(),
+            Ok(String::from("septante et un"))
+        );
+        assert_eq!(
+            Num2Words::new(80).lang(Lang::French_CH).to_words(),
+            Ok(String::from("huitante"))
+        );
+        assert_eq!(
+            Num2Words::new(92).lang(Lang::French_CH).to_words(),
+            Ok(String::from("nonante-deux"))
         );
     }
 
@@ -567,12 +666,14 @@ mod tests {
         use num_bigfloat::BigFloat;
 
         let mut num = BigFloat::from(1);
+        let mut un = "";
         for m in MEGAS {
             num *= BigFloat::from(1000);
             assert_eq!(
                 Num2Words::new(num).lang(Lang::French).cardinal().to_words(),
-                Ok(String::from(m))
+                Ok(String::from(format!("{}{}", un, m)))
             );
+            un = "un ";
         }
     }
 
