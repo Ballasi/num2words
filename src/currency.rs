@@ -6,6 +6,7 @@ use std::str::FromStr;
 /// exceptions are `DINAR`, `DOLLAR`, `PESO` and `RIYAL`, which are generic
 /// terminology for the respective currencies.
 #[derive(Clone, Copy)]
+#[non_exhaustive]
 pub enum Currency {
     /// Dirham
     AED,
