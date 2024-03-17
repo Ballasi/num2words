@@ -507,11 +507,10 @@ impl Ukrainian {
                 "ріал{}",
                 NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declension_idx]
             ),
-            Currency::RUB =>
-            //format!("рубл{}", NOUN_1ST_GROUP_MASCULINE_SOFT_DECLENSIONS[number_idx][declension_idx]),
-            {
-                String::from("руській воєнний корабль іді нахуй")
-            }
+            Currency::RUB => format!(
+                "рубл{}",
+                NOUN_1ST_GROUP_SOFT_DECLENSIONS_VOWEL[number_idx][declension_idx]
+            ),
             Currency::THB => format!(
                 "бат{}",
                 NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declension_idx]
@@ -529,7 +528,6 @@ impl Ukrainian {
                 "ранд{}",
                 NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declension_idx]
             ),
-            //_ => currency.default_string(self.number == GrammaticalNumber::Plural),
         }
     }
 
@@ -631,11 +629,10 @@ impl Ukrainian {
                 "філс{}",
                 NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declension_idx]
             ),
-            Currency::RUB =>
-            //format!("копійк{}", NOUN_1ST_GROUP_FEMININE_HARD_DECLENSIONS[number_idx][declension_idx]),
-            {
-                String::from("руській воєнний корабль іді нахуй")
-            }
+            Currency::RUB => format!(
+                "копійк{}",
+                NOUN_1ST_GROUP_HARD_DECLENSIONS[number_idx][declension_idx]
+            ),
             Currency::THB => format!(
                 "cатанг{}",
                 NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declension_idx]
@@ -650,7 +647,6 @@ impl Ukrainian {
                 "цент{}",
                 NOUN_2ST_GROUP_HARD_DECLENSIONS[number_idx][declension_idx]
             ),
-            //_ => currency.default_cent_string(self.number == GrammaticalNumber::Plural)
         }
     }
 
