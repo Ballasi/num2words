@@ -1,6 +1,10 @@
 use crate::{num2words::Num2Err, Currency, Language};
 use num_bigfloat::BigFloat;
-use std::str::FromStr;
+use alloc::str::FromStr;
+use alloc::string::String;
+use alloc::vec::Vec;
+use alloc::format;
+use alloc::vec;
 
 // Source: Ukrainian Orthography 2019 / Український Правопис 2019
 // § 38. Constructed numerals / Складні числівники

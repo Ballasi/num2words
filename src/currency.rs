@@ -1,4 +1,5 @@
-use std::str::FromStr;
+use alloc::str::FromStr;
+use alloc::string::String;
 
 /// Defines currencies
 ///

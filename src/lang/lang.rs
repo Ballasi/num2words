@@ -2,7 +2,10 @@ use crate::lang;
 use crate::num2words::Num2Err;
 use crate::Currency;
 use num_bigfloat::BigFloat;
-use std::str::FromStr;
+use alloc::str::FromStr;
+use alloc::string::String;
+use alloc::vec::Vec;
+use alloc::boxed::Box;
 
 /// Defines what is a language
 pub trait Language {

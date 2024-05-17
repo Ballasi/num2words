@@ -1,5 +1,8 @@
 use crate::{lang, Currency, Lang, Output};
 use num_bigfloat::BigFloat;
+use alloc::string::String;
+use alloc::vec::Vec;
+use alloc::vec;
 
 /// Error type returned by the builder
 #[derive(Debug, PartialEq)]
@@ -75,8 +78,8 @@ pub enum Num2Err {
     InfiniteYear,
 }
 
-impl std::fmt::Display for Num2Err {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+impl core::fmt::Display for Num2Err {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         write!(
             f,
             "{}",

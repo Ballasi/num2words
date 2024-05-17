@@ -1,7 +1,10 @@
 #![crate_type = "lib"]
 #![crate_name = "num2words"]
+#![no_std]
 
-/*!
+extern crate alloc;
+
+/**
  * Convert numbers like `42` to `forty-two`
  *
  * ## Usage

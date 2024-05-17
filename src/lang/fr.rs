@@ -1,5 +1,9 @@
 use crate::{num2words::Num2Err, Currency, Language};
 use num_bigfloat::BigFloat;
+use alloc::string::String;
+use alloc::vec::Vec;
+use alloc::format;
+use alloc::vec;
 
 pub struct French {
     feminine: bool,

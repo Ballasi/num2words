@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use alloc::str::FromStr;
 
 /// Type of the output `num2words` give
 pub enum Output {
