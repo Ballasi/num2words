@@ -139,7 +139,7 @@ impl French {
 
         while !num.is_zero() {
             thousands.push((num % bf_1000).to_u64().unwrap());
-            num /= bf_1000;
+            num = num.div(&bf_1000).int();
         }
 
         thousands
