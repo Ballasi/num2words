@@ -255,19 +255,26 @@ impl Num2Words {
     /// Adds a preference parameter
     ///
     /// # English language accepts:
-    /// oh and/or nil as replacements for "zero"
+    /// * oh and/or nil as replacements for "zero"
     /// 
     /// # French language accepts:
-    /// feminine/f/féminin/feminin
+    /// * feminine/f/féminin/feminin
     /// 
-    /// reformed/1990/rectifié/rectification
+    /// * reformed/1990/rectifié/rectification
+    ///
+    /// # Spanish language accepts:
+    /// * negativo/menos/bajo cero/prepended/appended
+    /// * veinte
+    /// * coma/punto
+    /// * f/femenino/feminine
+    /// * plural
     ///
     /// # Ukrainian language supports grammatical categories (bold - default):
-    /// Number: **singular/sing/однина/од**, plural/pl/множина/мн
+    /// * Number: **singular/sing/однина/од**, plural/pl/множина/мн
     ///
-    /// Gender: **masculine/m/чоловічий/чол/ч**, feminine/f/жіночий/жін/ж, neuter/n/середній/сер/с
+    /// * Gender: **masculine/m/чоловічий/чол/ч**, feminine/f/жіночий/жін/ж, neuter/n/середній/сер/с
     ///
-    /// Declension: **nominative/nom/називний/н**, genitive/gen/родовий/р, dative/dat/давальний/д,
+    /// * Declension: **nominative/nom/називний/н**, genitive/gen/родовий/р, dative/dat/давальний/д,\
     /// accusative/acc/знахідний/з, instrumental/inc/орудний/о, locative/loc/місцевий/м
     ///
     /// Examples:
@@ -280,6 +287,10 @@ impl Num2Words {
     /// assert_eq!(
     ///     Num2Words::new(161).lang(Lang::French).prefer("f").prefer("reformed").to_words(),
     ///     Ok(String::from("cent-soixante-et-une"))
+    /// );
+    /// assert_eq!(
+    ///     Num2Words::new(122.04).lang(Lang::Spanish).prefer("coma").prefer("veinte").to_words(),
+    ///     Ok(String::from("ciento veinte y dos coma cero cuatro"))
     /// );
     /// assert_eq!(
     ///     Num2Words::new(51).lang(Lang::Ukrainian).prefer("орудний").to_words(),

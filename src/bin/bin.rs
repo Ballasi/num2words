@@ -25,6 +25,7 @@ AVAILABLE LANGUAGES:
     fr:      French (France and Canada)
     fr_BE:   French (Belgium and the Democratic Republic of the Congo)
     fr_CH:   French (Swiss Confederation and Aosta Valley)
+    es:      Spanish
     uk:      Ukrainian
 
 AVAILABLE OUTPUTS:
