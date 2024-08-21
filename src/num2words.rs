@@ -256,10 +256,10 @@ impl Num2Words {
     ///
     /// # English language accepts:
     /// oh and/or nil as replacements for "zero"
-    /// 
+    ///
     /// # French language accepts:
     /// feminine/f/féminin/feminin
-    /// 
+    ///
     /// reformed/1990/rectifié/rectification
     ///
     /// # Ukrainian language supports grammatical categories (bold - default):

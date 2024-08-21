@@ -77,13 +77,15 @@ $ num2words --help
 
 Here is a list of all of the supported languages:
 
-| Flag | Code              | Locale    | Language    | 42            |
-| ---- | ----------------- | --------- | ----------- | ------------- |
-| 🇺🇸🇬🇧 | `Lang::English`   | `en`      | English     | forty-two     |
-| 🇫🇷🇨🇦 | `Lang::French`    | `fr`      | French      | quarante-deux |
-| 🇧🇪🇨🇩 | `Lang::French_BE` | `fr_BE`   | French (BE) | quarante-deux |
-| 🇨🇭   | `Lang::French_CH` | `fr_CH`   | French (CH) | quarante-deux |
-| 🇺🇦   | `Lang::Ukrainian` | `uk`      | Ukrainian   | сорок два     |
+| Flag         | Code              | Locale  | Language    | 42            |
+|--------------|-------------------|---------|-------------|---------------|
+| 🇺🇸🇬🇧     | `Lang::English`   | `en`    | English     | forty-two     |
+| 🇫🇷🇨🇦     | `Lang::French`    | `fr`    | French      | quarante-deux |
+| 🇧🇪🇨🇩     | `Lang::French_BE` | `fr_BE` | French (BE) | quarante-deux |
+| 🇨🇭         | `Lang::French_CH` | `fr_CH` | French (CH) | quarante-deux |
+| 🇺🇦         | `Lang::Ukrainian` | `uk`    | Ukrainian   | сорок два     |
+| 🇳🇱         | `Lang::Dutch`     | `nl`    | Dutch       | tweeenveertig |
+| 🏴󠁮󠁬󠁦󠁲󠁿 | `Lang::Frisian`   | `fy`    | Frisian     | twaenfjirtich |
 
 This list can be expanded! Contributions are welcomed.
 
@@ -93,7 +95,7 @@ Here is a list of all of the supported outputs types (with the associated
 command-line interface code):
 
 | Library method   | CLI argument  | Example output                         |
-| ---------------- | ------------- | -------------------------------------- |
+|------------------|---------------|----------------------------------------|
 | `.cardinal()`    | `cardinal`    | forty-two (42)                         |
 | `.ordinal()`     | `ordinal`     | forty-second (42)                      |
 | `.ordinal_num()` | `ordinal_num` | 42nd (42)                              |

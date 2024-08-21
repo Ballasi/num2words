@@ -81,6 +81,8 @@
  * | 🇧🇪🇨🇩 | `Lang::French_BE` | `fr_BE`   | French (BE) | quarante-deux |
  * | 🇨🇭   | `Lang::French_CH` | `fr_CH`   | French (CH) | quarante-deux |
  * | 🇺🇦   | `Lang::Ukrainian` | `uk`      | Ukrainian   | сорок два     |
+ * | 🇳🇱   | `Lang::Dutch`     | `nl`      | Dutch       | tweeenveertig |
+ * | 🏴󠁮󠁬󠁦󠁲󠁿   | `Lang::Frisian`   | `fy`      | Frisian     | twaenfjirtich |
  *
  * This list can be expanded! Contributions are welcomed.
  *

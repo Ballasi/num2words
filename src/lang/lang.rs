@@ -59,6 +59,22 @@ pub enum Lang {
     /// );
     /// ```
     Ukrainian,
+    /// ```
+    /// use num2words::{Num2Words, Lang};
+    /// assert_eq!(
+    ///     Num2Words::new(42).lang(Lang::Dutch).to_words(),
+    ///     Ok(String::from("tweeënveertig"))
+    /// );
+    /// ```
+    Dutch,
+    /// ```
+    /// use num2words::{Num2Words, Lang};
+    /// assert_eq!(
+    ///     Num2Words::new(42).lang(Lang::Frisian).to_words(),
+    ///     Ok(String::from("twaenfjirtich"))
+    /// );
+    /// ```
+    Frisian,
 }
 
 impl FromStr for Lang {
@@ -73,6 +89,8 @@ impl FromStr for Lang {
     /// | `fr_BE`   | `Lang::French_BE` | quarante-deux |
     /// | `fr_CH`   | `Lang::French_CH` | quarante-deux |
     /// | `uk`      | `Lang::Ukrainian` | сорок два     |
+    /// | `nl`      | `Lang::Dutch`     | tweeënveertig |
+    /// | `fy`      | `Lang::Frisian`   | twaenfjirtich |
     fn from_str(input: &str) -> Result<Self, Self::Err> {
         match input {
             "en" => Ok(Self::English),
@@ -152,6 +170,12 @@ pub fn to_language(lang: Lang, preferences: Vec<String>) -> Box<dyn Language> {
                 .find_map(|d| d.parse().ok())
                 .unwrap_or_default();
             Box::new(lang::Ukrainian::new(gender, number, declension))
+        }
+        Lang::Dutch => {
+            Box::new(lang::Dutch::new())
+        }
+        Lang::Frisian => {
+            Box::new(lang::Frisian::new())
         }
     }
 }
