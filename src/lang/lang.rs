@@ -52,6 +52,8 @@ pub enum Lang {
     /// ```
     French_CH,
     /// ```
+    Italian,
+    /// ```
     /// use num2words::{Num2Words, Lang};
     /// assert_eq!(
     ///     Num2Words::new(42).lang(Lang::Ukrainian).to_words(),
@@ -79,6 +81,7 @@ impl FromStr for Lang {
             "fr" => Ok(Self::French),
             "fr_BE" => Ok(Self::French_BE),
             "fr_CH" => Ok(Self::French_CH),
+            "it" => Ok(Self::Italian),
             "uk" => Ok(Self::Ukrainian),
             _ => Err(()),
         }
@@ -135,6 +138,7 @@ pub fn to_language(lang: Lang, preferences: Vec<String>) -> Box<dyn Language> {
 
             Box::new(lang::French::new(feminine, reformed, lang::fr::RegionFrench::CH))
         }
+        Lang::Italian => Box::new(lang::it::Italian::new()),
         Lang::Ukrainian => {
             let declension: lang::uk::Declension = preferences
                 .iter()
