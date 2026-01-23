@@ -256,10 +256,10 @@ impl Num2Words {
     ///
     /// # English language accepts:
     /// oh and/or nil as replacements for "zero"
-    /// 
+    ///
     /// # French language accepts:
     /// feminine/f/féminin/feminin
-    /// 
+    ///
     /// reformed/1990/rectifié/rectification
     ///
     /// # Ukrainian language supports grammatical categories (bold - default):
@@ -286,6 +286,13 @@ impl Num2Words {
     ///     Ok(String::from("пʼятдесятьма одним"))
     /// );
     /// ```
+    /// # Chinese language accepts:
+    /// ling/零 or yuan/〇 (zero style)
+    ///
+    /// one_ten/一十 or ten/十 (ten style)
+    ///
+    /// trad/traditional/繁 or simp/simplified/简
+
     pub fn prefer<T>(mut self, prefer: T) -> Self
     where
         T: Into<String>,
