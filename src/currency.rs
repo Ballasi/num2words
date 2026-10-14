@@ -5,7 +5,7 @@ use std::str::FromStr;
 /// Every three-letter variant is a valid ISO 4217 currency code. The only
 /// exceptions are `DINAR`, `DOLLAR`, `PESO` and `RIYAL`, which are generic
 /// terminology for the respective currencies.
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 #[non_exhaustive]
 pub enum Currency {
     /// Dirham

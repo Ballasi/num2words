@@ -247,11 +247,12 @@ impl Language for English {
     }
 
     fn to_ordinal_num(&self, num: BigFloat) -> Result<String, Num2Err> {
-        let tail = (num % BigFloat::from(100)).to_u64().unwrap();
+        let num = num.to_u128().ok_or(Num2Err::CannotConvert)?;
+        let tail = num % 100;
         let last = tail % 10;
         Ok(format!(
             "{}{}",
-            num.to_u128().unwrap(),
+            num,
             match (tail / 10 != 1, last) {
                 (true, 1) => "st",
                 (true, 2) => "nd",
@@ -274,14 +275,20 @@ impl Language for English {
             suffix = " BC";
         }
 
+        // if year is beyond 9999, go cardinal, which also keeps the split
+        // below within i64
+        if num >= BigFloat::from(10000) {
+            return Ok(format!("{}{}", self.int_to_cardinal(num)?, suffix));
+        }
+
         let bf_100 = BigFloat::from(100);
 
         let (high, low) = (
             (num / bf_100).to_i64().unwrap(),
             (num % bf_100).to_i64().unwrap(),
         );
-        let year_word = if high == 0 || (high % 10 == 0 && low < 10) || high >= 100 {
-            // if year is 00XX, X00X, or beyond 9999, go cardinal
+        let year_word = if high == 0 || (high % 10 == 0 && low < 10) {
+            // if year is 00XX or X00X, go cardinal
             self.int_to_cardinal(num)?
         } else {
             let high_word = self.int_to_cardinal(BigFloat::from(high))?;

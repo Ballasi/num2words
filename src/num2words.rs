@@ -92,6 +92,22 @@ impl std::fmt::Display for Num2Err {
     }
 }
 
+/// Allows `Num2Err` to be used with `?` in functions returning
+/// `Box<dyn Error>`
+///
+/// Example:
+/// ```
+/// use num2words::Num2Words;
+/// fn words() -> Result<String, Box<dyn std::error::Error>> {
+///     Ok(Num2Words::new(-42).ordinal().to_words()?)
+/// }
+/// assert_eq!(
+///     words().unwrap_err().to_string(),
+///     "cannot treat negative number as ordinal"
+/// );
+/// ```
+impl std::error::Error for Num2Err {}
+
 /// Builder for `num2words`
 pub struct Num2Words {
     num: BigFloat,
@@ -345,5 +361,77 @@ mod tests {
     fn test_string_not_valid() {
         assert!(Num2Words::parse("not a number").is_none());
         assert!(Num2Words::parse("NAN").is_none());
+    }
+
+    #[test]
+    fn test_no_panic() {
+        use std::panic::catch_unwind;
+        use std::str::FromStr;
+
+        let langs = [
+            Lang::English,
+            Lang::French,
+            Lang::French_BE,
+            Lang::French_CH,
+            Lang::Ukrainian,
+        ];
+        let nums = [
+            "0",
+            "-0",
+            "1",
+            "-1",
+            "0.5",
+            "-0.5",
+            "-1.5",
+            "-0.001",
+            "99.999",
+            "1e-30",
+            "-1e-30",
+            "1e19",
+            // i64::MAX + 1
+            "9223372036854775808",
+            "1e30",
+            "-1e30",
+            // u128::MAX + 1
+            "340282366920938463463374607431768211456",
+            "1e40",
+            "-1e40",
+            "1e100",
+            "-1e100",
+            "inf",
+            "-inf",
+        ];
+        type SetOutput = fn(Num2Words) -> Num2Words;
+        let outputs: [(&str, SetOutput); 4] = [
+            ("cardinal", Num2Words::cardinal),
+            ("ordinal", Num2Words::ordinal),
+            ("ordinal_num", Num2Words::ordinal_num),
+            ("year", Num2Words::year),
+        ];
+        let currencies = [
+            "AED", "ARS", "AUD", "BRL", "CAD", "CHF", "CLP", "CNY", "COP", "CRC", "DINAR",
+            "DOLLAR", "DZD", "EUR", "GBP", "HKD", "IDR", "ILS", "INR", "JPY", "KRW", "KWD", "KZT",
+            "MXN", "MYR", "NOK", "NZD", "PEN", "PESO", "PHP", "PLN", "QAR", "RIYAL", "RUB", "SAR",
+            "SGD", "THB", "TRY", "TWD", "UAH", "USD", "UYU", "VND", "ZAR",
+        ];
+
+        let mut panics = vec![];
+        for lang in langs {
+            for num in nums {
+                let builder = || Num2Words::parse(num).unwrap().lang(lang);
+                for (name, output) in outputs {
+                    if catch_unwind(|| output(builder()).to_words()).is_err() {
+                        panics.push(format!("{:?} {} {}", lang, num, name));
+                    }
+                }
+                for code in currencies {
+                    let currency = Currency::from_str(code).unwrap();
+                    if catch_unwind(|| builder().currency(currency).to_words()).is_err() {
+                        panics.push(format!("{:?} {} {}", lang, num, code));
+                    }
+                }
+            }
+        }
+        assert!(panics.is_empty(), "panicked on: {:#?}", panics);
     }
 }

@@ -329,7 +329,7 @@ impl Language for French {
     fn to_ordinal_num(&self, num: BigFloat) -> Result<String, Num2Err> {
         Ok(format!(
             "{}{}",
-            num.to_u128().unwrap(),
+            num.to_u128().ok_or(Num2Err::CannotConvert)?,
             if num == BigFloat::from(1) {
                 "er"
             } else {

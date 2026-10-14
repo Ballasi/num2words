@@ -825,6 +825,12 @@ impl Language for Ukrainian {
         }
 
         let triplets = self.split_thousands(num);
+        // split_thousands can append zero triplets, so the highest order is
+        // the position of the last non-zero one
+        match triplets.iter().rposition(|&t| t != 0) {
+            Some(order) if order > MEGA_BASES.len() => return Err(Num2Err::CannotConvert),
+            _ => (),
+        }
         let last_non_empty = triplets.iter().position(|&t| t != 0).unwrap();
 
         //special case: one unit (thousand, million etc.) in the number
@@ -943,7 +949,10 @@ impl Language for Ukrainian {
 
     fn to_ordinal_num(&self, num: BigFloat) -> Result<String, Num2Err> {
         let flexion = self.ordinal_flexion_short(num);
-        Ok(format!("{}-{flexion}", num.to_u128().unwrap()))
+        Ok(format!(
+            "{}-{flexion}",
+            num.to_u128().ok_or(Num2Err::CannotConvert)?
+        ))
     }
 
     fn to_year(&self, num: BigFloat) -> Result<String, Num2Err> {

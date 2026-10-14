@@ -15,6 +15,7 @@ pub trait Language {
 
 /// Languages available in `num2words`
 #[allow(non_camel_case_types)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum Lang {
     /// ```
     /// use num2words::{Num2Words, Lang};
@@ -153,5 +154,27 @@ pub fn to_language(lang: Lang, preferences: Vec<String>) -> Box<dyn Language> {
                 .unwrap_or_default();
             Box::new(lang::Ukrainian::new(gender, number, declension))
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::*;
+    use std::str::FromStr;
+
+    #[test]
+    fn test_derives() {
+        let lang = Lang::from_str("fr_BE").unwrap();
+        assert_eq!(lang, Lang::French_BE);
+        assert_ne!(lang, Lang::French);
+        assert_eq!(format!("{:?}", lang), "French_BE");
+
+        let currency = Currency::from_str("EUR").unwrap();
+        assert_eq!(currency, Currency::EUR);
+        assert_eq!(format!("{:?}", currency), "EUR");
+
+        // Copy: both values can still be used after being moved
+        let _ = Num2Words::new(42).lang(lang).currency(currency).to_words();
+        let _ = Num2Words::new(42).lang(lang).currency(currency).to_words();
     }
 }
