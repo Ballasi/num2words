@@ -54,6 +54,14 @@ pub enum Lang {
     /// ```
     /// use num2words::{Num2Words, Lang};
     /// assert_eq!(
+    ///     Num2Words::new(42).lang(Lang::Turkish).to_words(),
+    ///     Ok(String::from("kırk iki"))
+    /// );
+    /// ```
+    Turkish,
+    /// ```
+    /// use num2words::{Num2Words, Lang};
+    /// assert_eq!(
     ///     Num2Words::new(42).lang(Lang::Ukrainian).to_words(),
     ///     Ok(String::from("сорок два"))
     /// );
@@ -72,6 +80,7 @@ impl FromStr for Lang {
     /// | `fr`      | `Lang::French`    | quarante-deux |
     /// | `fr_BE`   | `Lang::French_BE` | quarante-deux |
     /// | `fr_CH`   | `Lang::French_CH` | quarante-deux |
+    /// | `tr`      | `Lang::Turkish`   | kırk iki      |
     /// | `uk`      | `Lang::Ukrainian` | сорок два     |
     fn from_str(input: &str) -> Result<Self, Self::Err> {
         match input {
@@ -79,6 +88,7 @@ impl FromStr for Lang {
             "fr" => Ok(Self::French),
             "fr_BE" => Ok(Self::French_BE),
             "fr_CH" => Ok(Self::French_CH),
+            "tr" => Ok(Self::Turkish),
             "uk" => Ok(Self::Ukrainian),
             _ => Err(()),
         }
@@ -134,6 +144,13 @@ pub fn to_language(lang: Lang, preferences: Vec<String>) -> Box<dyn Language> {
                 .is_some();
 
             Box::new(lang::French::new(feminine, reformed, lang::fr::RegionFrench::CH))
+        }
+        Lang::Turkish => {
+            let joined = preferences
+                .iter()
+                .any(|v| ["joined", "bitişik", "bitisik"].contains(&v.as_str()));
+
+            Box::new(lang::Turkish::new(joined))
         }
         Lang::Ukrainian => {
             let declension: lang::uk::Declension = preferences

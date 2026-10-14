@@ -151,10 +151,16 @@ impl English {
         Ok(words.join(" "))
     }
 
-    fn float_to_cardinal(&self, num: BigFloat) -> Result<String, Num2Err> {
-        let integral_part = num.int();
+    fn float_to_cardinal(&self, mut num: BigFloat) -> Result<String, Num2Err> {
         let mut words: Vec<String> = vec![];
 
+        // the sign is handled here, as the integral part of e.g. -0.5 is zero
+        if num.is_negative() {
+            words.push(String::from("minus"));
+            num = -num;
+        }
+
+        let integral_part = num.int();
         if !integral_part.is_zero() {
             let integral_word = self.int_to_cardinal(integral_part)?;
             words.push(integral_word);
@@ -481,6 +487,20 @@ mod tests {
                 .cardinal()
                 .to_words(),
             Ok(String::from("twelve point five nine"))
+        );
+        assert_eq!(
+            Num2Words::new(-12.5)
+                .lang(Lang::English)
+                .cardinal()
+                .to_words(),
+            Ok(String::from("minus twelve point five"))
+        );
+        assert_eq!(
+            Num2Words::new(-0.5)
+                .lang(Lang::English)
+                .cardinal()
+                .to_words(),
+            Ok(String::from("minus point five"))
         );
     }
 

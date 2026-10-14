@@ -83,6 +83,7 @@ Here is a list of all of the supported languages:
 | 🇫🇷🇨🇦 | `Lang::French`    | `fr`      | French      | quarante-deux |
 | 🇧🇪🇨🇩 | `Lang::French_BE` | `fr_BE`   | French (BE) | quarante-deux |
 | 🇨🇭   | `Lang::French_CH` | `fr_CH`   | French (CH) | quarante-deux |
+| 🇹🇷   | `Lang::Turkish`   | `tr`      | Turkish     | kırk iki      |
 | 🇺🇦   | `Lang::Ukrainian` | `uk`      | Ukrainian   | сорок два     |
 
 This list can be expanded! Contributions are welcomed.
